@@ -5,7 +5,7 @@
 
 
 % List of directories to add
-folders = {'basic/','exec/','parser/'};
+folders = stopgap_source_folders;
 n_folders = numel(folders);
 
 % Get current folder

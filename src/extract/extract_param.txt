@@ -1,0 +1,10 @@
+rootdir=/fs/pool/pool-plitzko/will_wan/HIV_testset/subtomo/bin8/full/
+motl_name=lists/allmotl_1.star
+tomo_dir=/fs/pool/pool-plitzko/will_wan/HIV_testset/tomo/bin8_novactf/
+tomo_digits=1
+subtomo_name=subtomograms/subtomo
+subtomo_digits=1
+boxsize=64
+comm_dir=comm/
+stats_dir=stats/
+n_cores=5

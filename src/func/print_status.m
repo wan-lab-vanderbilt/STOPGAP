@@ -9,9 +9,22 @@ function n_back = print_status(string, n_back)
 % Backspace string
 back = repmat('\b',[1,n_back]);
 
-% Print output
-fprintf([back,string]);
-
 % Return length of input string
-n_back = numel(string);
+str_length = numel(string);
+
+% Blank spacking to clear previous string
+if n_back > str_length
+    n_blank = n_back - str_length;
+else
+    n_blank = 0;
+end
+blank = char(zeros(1,n_blank));
+
+% Print output
+fprintf([back,string,blank]);
+
+% Return n_back
+n_back = numel([string,blank]);
+
+
 

@@ -1,79 +1,109 @@
-function f = generate_wedgemask_slices(o,f,mode)
+function [bin_wedge, wedge_weight, slice_idx] = generate_wedgemask_slices(boxsize,tilts,bpf,shift)
 %% generate_wedgemask_slices
-% A function to generate wedgemasks slices. It returns a set of slice
-% indices, which can be used for generating localized slice filters. It
-% also retursn a slice_weight, which is used for reweighting areas sampled
-% by multiple tilts, and a binary mask. 
+% Generate wedgemasks as a set of 2D-slices. Input parametes are input
+% boxsize, input tilt-angles, bandpass filter, and whether to apply an
+% fftshift.
 %
-% WW 01-2018
+% If a bandpass filter is supplied, the slice indices will with respect to
+% the masked-in regions. The bandpass filter is assumed to be fftshifted
+% in the same way as the 'shift' input. 
+%
+% For non-cubic volumes, the XZ-slices are calculated using the largest
+% dimension and Fourier cropped to the non-square size. 
+%
+% WW 06-2019
 
-%% Initialize
+%% Check check
 
-% Parse wedge index
-w = f.wedge_idx;
+% Check for fft-shift
+if nargin < 4
+    shift = false;
+end
+
+% Check for bandpass filter
+if nargin < 3
+    bpf = ones(boxsize,'single');
+end
+
+%% Generate XZ-slice
+
+% Check XZ agreement
+square = boxsize(1) == boxsize(3);
+
+% Parse largest XZ dimension
+max_xz = max(boxsize([1,3]));
+
+% Generate slice
+slice = zeros(max_xz,max_xz,'single');
+slice(:,floor(max_xz/2)+1) = 1;
+
+
+%% Generate slices
 
 % Number of tilts
-n_tilts = numel(o.wedgelist(w).wedge_angles);
+n_tilts = numel(tilts);
 
-% Generate 2D slice image
-img = zeros(o.boxsize,o.boxsize);
-img(:,o.cen) = 1;
+% Slice indices
+slice_idx = cell(n_tilts,1);
 
-% Linear bandpass indices
-if strcmp(mode,'align')
-    bpf_idx = o.bandpass(:) > 0;
-elseif strcmp(mode,'aver')
-    bpf_idx = true(o.boxsize^3,1);
-end
+% Sum volume
+sum_slice= zeros(boxsize([1,3]),'single');
 
-% Initialize slices
-f.slice_idx = cell(n_tilts,1);
-
-% Weight
-f.slice_weight = zeros(o.boxsize,o.boxsize,o.boxsize);
-weight = zeros(o.boxsize^3,1);
-
-%% Find indices for each slice
-
+% Loop through tilts
 for i = 1:n_tilts
     
-    % Rotate 2D image
-    r_img = tom_rotate(img,o.wedgelist(w).wedge_angles(i)) >= 0.5;
+    % Rotate slice
+    rslice = tom_rotate(slice,tilts(i));
+    rslice = single(rslice>exp(-2));
     
-    % 3D slice
-    slice_vol = permute(repmat(r_img,[1,1,o.boxsize]),[1,3,2]);
-    if strcmp(mode,'align')
-        slice_vol = ifftshift(slice_vol);
+    % Fourier crop
+    if ~square
+        rslice = sg_crop_image(fftshift(fft2(rslice)),boxsize([1,3]));
+        rslice = real(ifft2(ifftshift(rslice)));
+        rslice = single(rslice>exp(-2));
     end
     
-    % Indices
-    temp_slice_idx = slice_vol(:) & bpf_idx;
+    % Sum slice
+    sum_slice = sum_slice + rslice;
     
-    % Add to weights
-    weight = weight + temp_slice_idx;
+    % Generate 3D slice
+    proj = permute(repmat(rslice,[1,1,boxsize(2)]),[1,3,2]);
     
-    % Store indices
-    f.slice_idx{i} = find(temp_slice_idx);
+    % FFT shift
+    if shift
+        proj = ifftshift(proj);
+    end
+    
+    % Apply bandpass
+    proj = proj.*bpf;
+    
+    % Save indices
+    slice_idx{i} = find(proj > 0); 
     
 end
 
-%% Generate reweighting filter
 
-% Reshape weight as 3D-volume
-weight = reshape(weight,[o.boxsize,o.boxsize,o.boxsize]);
-
-% Non-zero indices
-w_idx = (weight > 0);
-
-% Invert values for filter
-f.slice_weight(w_idx) = 1./weight(w_idx);
+% Generate binary slice
+bin_slice = sum_slice > 0;
 
 
-
-%% Generate binary mask
-
-% Get binary mask
-f.bin_wedge = double(w_idx);
+% Generate slice weight
+slice_wei = zeros(boxsize([1,3]),'single');
+slice_wei(bin_slice) = 1./sum_slice(bin_slice);
 
 
+% Generate binary wedge
+bin_wedge = single(permute(repmat(bin_slice,[1,1,boxsize(2)]),[1,3,2]));
+
+% Generate 3D wedge weight
+wedge_weight = permute(repmat(slice_wei,[1,1,boxsize(2)]),[1,3,2]);
+
+% Check FFT shift
+if shift
+    bin_wedge = ifftshift(bin_wedge);
+    wedge_weight = ifftshift(wedge_weight);
+end
+    
+    
+    
 

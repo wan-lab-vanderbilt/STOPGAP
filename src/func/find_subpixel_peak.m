@@ -10,8 +10,13 @@ function [coord, I] = find_subpixel_peak(vol,mask)
 
 %% Find initial peak
 
+% Apply mask
+if nargin == 2
+    vol = vol.*mask;
+end
+
 % Initial peak position
-[peak, idx] = max(vol(:).*mask(:));
+[peak, idx] = max(vol(:));
 [x,y,z] = ind2sub(size(vol),idx);
 
 

@@ -1,0 +1,3 @@
+compile_parser
+compile_stopgap
+compile_watcher

@@ -13,22 +13,22 @@ function o = calculate_cone_angle_list(p,o,idx)
 %
 % WW 01-2018
 
-% % % DEBUG
-% angincr=2;
-% angiter=3;
-% phi_angincr=2;
-% phi_angiter=3;
 
 
 %% Calculate angles
 
+% Parse cone search type
+if sg_check_param(p(idx),'cone_search_type')
+    cone_search_type = p(idx).cone_search_type;
+end
+
 % Calculate cone angles
-cone_angles = calculate_cone_angles(p(idx).angincr, p(idx).angiter, p(idx).cone_search_type);
+cone_angles = calculate_cone_angles(p(idx).angincr, p(idx).angiter, cone_search_type);
 n_cones = size(cone_angles,2);
 
 % Calculate phi angles
 phi_range = p(idx).phi_angincr*p(idx).phi_angiter;
-phi_array = -phi_range:p(idx).phi_angincr:phi_range;
+phi_array = circshift(-phi_range:p(idx).phi_angincr:phi_range,[1,-p(idx).phi_angiter]); % Places no-rotation at first position
 if isempty(phi_array)
     phi_array = 0;
 end
@@ -38,11 +38,5 @@ n_phi = numel(phi_array);
 n_angles = n_cones*n_phi;
 o.anglist = cat(1,reshape(repmat(phi_array,[n_cones,1]),[1,n_angles]),repmat(cone_angles,[1,n_phi]));
 o.n_ang = size(o.anglist,2);
-
-% Convert search angles to quaternions
-o.q_ang = cell(o.n_ang,1);
-for i = 1:o.n_ang
-    o.q_ang{i} = will_euler2quaternion(o.anglist(1,i),o.anglist(2,i),o.anglist(3,i));  % Convert cone angle to quaternion 
-end
 
 

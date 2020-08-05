@@ -1,4 +1,4 @@
-function defocii = calculate_local_defocii(p,o,f,idx,motl)
+function defocii = calculate_local_defocii(p,o,idx,f,motl)
 %% calculate_local_defocii
 % A function to calculate local defocii value for a given particle. In
 % order to calculate this, the wedgelist must contain the tomogram's
@@ -11,59 +11,60 @@ function defocii = calculate_local_defocii(p,o,f,idx,motl)
 
 %% Initialize
 
-% Wedgelist index
-w = f.wedge_idx;
-
 % If there are not enough parameters, return mean defocii
-if ~isfield(o.wedgelist,'tomo_dims')
-    defocii = o.wedgelist(w).defocii;
+if ~all(isfield(o.wedgelist(f.wedge_idx),{'tomo_x','tomo_y','tomo_z','z_shift'}))
+    defocii = o.wedgelist(f.wedge_idx).defocus;
     return
 end
 
-% Shifted position
-pos = motl(8:10,1,1) + motl(11:13,1,1);
-
 % Number of tilts
-n_tilts = numel(o.wedgelist(w).wedge_angles);
+n_tilts = numel(o.wedgelist(f.wedge_idx).tilt_angle);
 
-% Calcuate center of Y and Z dimensions
-cenX = floor(o.wedgelist(w).tomo_dims(1)/2)+1;
-cenZ = mean((o.allmotl(10,:)+o.allmotl(13,:)),2);
+% Tomogram dimensions
+tomo_dims = floor([o.wedgelist(f.wedge_idx).tomo_x;o.wedgelist(f.wedge_idx).tomo_y;o.wedgelist(f.wedge_idx).tomo_z]./p(idx).binning);
 
-% Offset positions in tomogram
-x = (pos(1)-cenX).*p(idx).pixelsize;
-z = (pos(3)-cenZ).*p(idx).pixelsize;
+% Tomogram centers
+tomo_cen = floor(tomo_dims/2)+1;
+tomo_cen(3) = tomo_cen(3) - (o.wedgelist(f.wedge_idx).z_shift./p(idx).binning);
+
+% Determine positions
+pos = zeros(3,1,'single');
+pos(1) = mean(motl.orig_x + motl.x_shift)-tomo_cen(1);
+pos(2) = mean(motl.orig_y + motl.y_shift)-tomo_cen(2);
+pos(3) = mean(motl.orig_z + motl.z_shift)-(tomo_cen(3)-o.wedgelist(f.wedge_idx).z_shift);
+
+
 
 %% Calcualte defocii
 
 % Average defocii
-if size(o.wedgelist(w).defocii,2) == 3
-    defocii = mean(o.wedgelist(w).defocii(1:2,:),1);
-elseif size(o.wedgelist(w).defocii,2) == 1
-    defocii = o.wedgelist(w).defocii;
+if size(o.wedgelist(f.wedge_idx).defocus,2) == 3
+    defocii = mean(o.wedgelist(f.wedge_idx).defocus(:,1:2),2);
+elseif size(o.wedgelist(f.wedge_idx).defocus,2) == 1
+    defocii = o.wedgelist(f.wedge_idx).defocus;
 else
-    error('ACHTUNG!!! Invalid number of defocii columns!!!');
+    error('ACHTUNG!!! Invalid number of defocus columns!!!');
 end
 
+
 % Calculate offsets
-offsets = zeros(n_tilts,1);
+offsets = zeros(n_tilts,1,'single');
 
 for i = 1:n_tilts
     
     % Calculate rotation matrix
-    a = o.wedgelist(w).wedge_angles(i);
-    r = [cosd(a), -sind(a); sind(a), cosd(a)];
+    q = sg_axisangle2quaternion([0,1,0],o.wedgelist(f.wedge_idx).tilt_angle(i));
+    rmat = sg_quaternion2matrix(q);
     
-    % Rotate coords
-    r_coords = r*[x;z];
+    % Rotate positions
+    r_pos = rmat*pos;
     
     % Store offset
-    offsets(i) = r_coords(2);
+    offsets(i) = r_pos(3) - f.cen_mass(i);
         
 end
 
 % Calculate offset defocii
 defocii = defocii - (offsets./10000); % Negative Z is increasing underfocus
-
 
 

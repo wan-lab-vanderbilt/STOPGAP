@@ -1,9 +1,9 @@
-function [mref,n_pix,m_idx] = normalize_under_mask(ref, mask)
+function [ref,n_pix,m_idx] = normalize_under_mask(ref, mask)
 %% normalize_under_mask
 % A function to take a reference volume and a mask, and normalize the area
 % under the mask to 0-mean and standard deviation of 1. 
 %
-% WW 02-2018
+% WW 06-2019
 
 
 %% Normalize reference!!!
@@ -12,11 +12,13 @@ function [mref,n_pix,m_idx] = normalize_under_mask(ref, mask)
 m_idx = mask > 0;
 n_pix = sum(mask(:));   % Pixels under mask
 
-% Mask and set mea to zero
-mref = ref.*mask;
-mref(m_idx) = mref(m_idx)-(sum(mref(m_idx))./n_pix);
+% Calcualte stats
+m = mean(ref(m_idx));
+s = std(ref(m_idx));
 
-% Normalization factor of references
-sigmaRef = sqrt(sum(mref(m_idx).^2)./n_pix); % StDev of area under mask
-mref = mref./sigmaRef;
+% Normalize reference
+ref = ref - m;
+ref = ref./s;
+ref = ref.*mask;
+
 

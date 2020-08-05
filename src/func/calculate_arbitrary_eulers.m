@@ -67,22 +67,26 @@ end
 ang_perm = combvec(angle_array{1},angle_array{2},angle_array{3});
 o.n_ang = size(ang_perm,2);
 
+% Sort to place zero-rotation in position 1
+idx = find(sum(abs(ang_perm),1)==0);
+ang_perm = circshift(ang_perm,[1,-idx+1]);
+
 %% Generate euler triples
 
 % Initialize new eulers
 o.q_ang = cell(o.n_ang,1);
 
-% Generate new eulers
+% Generate new angles
 
 for i = 1:o.n_ang
 
     % Convert single rotations to quaternions
-    q1 = will_axisangle2quaternion(a.(axes{1}),ang_perm(1,i));
-    q2 = will_axisangle2quaternion(a.(axes{2}),ang_perm(2,i));
-    q3 = will_axisangle2quaternion(a.(axes{3}),ang_perm(3,i));
+    q1 = axisangle2quaternion(a.(axes{1}),ang_perm(1,i));
+    q2 = axisangle2quaternion(a.(axes{2}),ang_perm(2,i));
+    q3 = axisangle2quaternion(a.(axes{3}),ang_perm(3,i));
     
     % Combine rotations
-    q = will_quaternion_multiply(q3,q2,q1);
+    q = quaternion_multiply(q3,q2,q1);
     
     % Store quaternion
     o.q_ang{i} = q;    

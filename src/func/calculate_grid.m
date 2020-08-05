@@ -9,9 +9,9 @@ function grid = calculate_grid(boxsize,mode)
 %% Check check
 
 if nargin == 1
-    mode = 'aver';
+    mode = 'avg';
 elseif nargin ==2
-    if ~any(strcmp(mode,{'align','aver'}))
+    if ~any(strcmp(mode,{'ali','avg'}))
         error('ACHTUNG!!! Invalid mode!!!');
     end
 else 

@@ -1,4 +1,4 @@
-function f = generate_exposure_filter_slices(o,f)
+function f = generate_exposure_filter_slices(o,f,mode)
 %% generate_exposure_filter_slices
 % A function for generating a per-slice dose filter. 
 %
@@ -24,10 +24,28 @@ else
     c = 2.81;
 end
 
+
+%% Check for supersampling
+
+% Check for super sampling
+if sg_check_param(o,'avg_ss')
+    ss = o.avg_ss > 1;
+else
+    ss = false;
+end
+
+
+if strcmp(mode,'avg') && ss
+    boxsize = o.ss_boxsize;
+else
+    boxsize = o.boxsize;
+end
+
+
 %% Calculate filter per slices
 
 % Initialize dose filter
-exp_filt = zeros(o.boxsize,o.boxsize,o.boxsize);
+exp_filt = zeros(boxsize,'single');
 
 % Number of slices
 n_slices = numel(f.slice_idx);
@@ -39,12 +57,12 @@ for i = 1:n_slices
     temp_freq = f.freq_array(f.slice_idx{i});
     
     % Calculate exposure-dependent amplitude attenuator
-    exp_filt(f.slice_idx{i}) = exp_filt(f.slice_idx{i}) + exp((-o.wedgelist(w).dose(i))./(2.*((a.*(temp_freq.^b))+c)));
+    exp_filt(f.slice_idx{i}) = exp_filt(f.slice_idx{i}) + exp((-o.wedgelist(w).exposure(i))./(2.*((a.*(temp_freq.^b))+c)));
 
 end
 
 % Reweight filter
-f.exp_filt = exp_filt.*f.slice_weight;
+f.exp_filt = exp_filt.*f.wedge_weight;
 
 
     

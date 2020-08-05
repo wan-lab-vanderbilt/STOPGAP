@@ -1,0 +1,89 @@
+STOPGAP Install Notes
+
+NOTE: This superceeds the install section in the documentation. 
+
+
+
+
+In the tarball are a number of folders: 
+
+The "sg_toolbox" folder contains the STOPGAP MATLAB toolbox. Add this to your MATLAB 
+path. 
+
+The "bash" folder contains example bash files used to run STOPGAP. Basic usage is to
+copy these into each processing folder and edit the parameters as necessary. 
+
+The "exec" folder contains two subfolders: "bin" and "lib". The "bin" folder contains
+the bash scripts for sourcing the MATLAB libraries (MCR) and running the compiled 
+MATLAB executables. DO NOT edit anything in the "bin" folder. The "lib" folder 
+contains stopgap_config.sh, which is used to source the MCR. The compiled MATLAB
+executables will end up here. If using 
+
+The 'src' directory contains the MATLAB source code. DO NOT add this to your MATLAB 
+path. 
+
+
+
+
+
+Installing STOPGAP:
+
+First, we need to define a bash environmental variable called STOPGAPHOME. The easy
+way to do this for yourself is to edit your ~/.bashrc and add the line:
+    'export STOGAPHOME=/path/to/stopgap/exec/'
+with the path pointing to the STOPGAP "exec" folder. To update your bashrc run:
+    'source '~/.bashrc'
+To check it worked, run:
+    'echo $STOPGAPHOME'
+It should return the path to the "exec" folder. 
+
+
+Next, we have to edit the stopgap_config.sh file in the "exec/lib/" directory. Edit 
+the 'matlabRoot' to point to your MATLAB directory; match it to the version you 
+will compile with. If you don't know where you MATLAB directory, try using the 
+'which' command. For example, when I run 'which matlab', it retuns:
+'/fs/pool/pool-apps-rz/MATLAB_2015b/bin/matlab'. In this case, the 'matlabRoot' is
+'/fs/pool/pool-apps-rz/MATLAB_2015b/'. Also, make sure stopgap_confish.sh is 
+executable. 
+
+
+Finally, we need to compile the STOPGAP executables. If you're not compiling 
+yourself, download the precompiled executables and copy to the "exec/lib/"
+directory. Make sure to use the correct version of the MCR.
+
+To compile the STOPGAP executables, first load MATLAB and make sure the 
+sg_toolbox is in your path. Next, go to the STOPGAP 'src' folder and run 
+'stopgap_source.m'. This temporarily adds the source code to your MATLAB path; to 
+undo this run 'stopgap_unsource.m' or restart MATLAB. Then run 'compile_all"; this
+will take a few minutes. When it's finished there should be a bunch of new files
+in the STOPGAP 'exec/lib' folder. The files without extensions are the executables.
+
+
+
+Running STOPGAP in parallel:
+
+The 'run_stopgap.sh' and 'stopgap_extract.sh' bash scripts are run in parallel; 
+they will probably need to be edited to match your particular settings. 
+
+
+'stogap_extract.sh' is written to run locally. There shouldn't be any more edits 
+required.
+
+The supplied 'run_stopgap.sh' was written to run locally and on the MPI Biochemie's 
+SGE and SLURM clusters. Basically, the bash script has a few conditions for the 
+run_type; for each run_type the script writes a submission file and launches it 
+using the local or cluster specific command. Local and SGE launches using 'mpiexec', 
+SLURM uses the 'srun' command. If you need to use 'mpirun', you should be able just
+replace 'mpiexec' with 'mpirun'. 
+
+
+
+
+
+
+
+
+
+
+
+
