@@ -4,5 +4,9 @@ function compile_watcher()
 clear all
 close all
 
+% Get STOPGAPHOME
+[~,stopgaphome] = system('echo $STOPGAPHOME');
+
 % Compile
-mcc -mv -R nojvm -R -nodisplay -R -singleCompThread -R -nosplash stopgap_watcher.m -d /fs/gpfs06/lv03/fileset01/pool/pool-plitzko/will_wan/software/stopgap/0.7.0/module/lib/
+mcc('-mv', '-R', 'nojvm', '-R', '-nodisplay', '-R' ,'-singleCompThread', '-R', '-nosplash', 'stopgap_watcher.m', '-d', [stopgaphome(1:end-1),'/lib/'])
+
