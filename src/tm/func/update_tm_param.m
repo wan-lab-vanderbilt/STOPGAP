@@ -14,10 +14,10 @@ if exist([rootdir,'/',param_name],'file')
     try
         p = sg_read_tm_param(rootdir,param_name);
     catch
-        error([s.nn,'Achtung!!!! Error reading parameter file: ',param_name]);
+        error([s.cn,'Achtung!!!! Error reading parameter file: ',param_name]);
     end
 else
-    error([s.nn,'Achtung!!! ',param_name,' does not exist!!!']);
+    error([s.cn,'Achtung!!! ',param_name,' does not exist!!!']);
 end
 
 

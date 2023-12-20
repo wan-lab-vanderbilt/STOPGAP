@@ -10,13 +10,13 @@
 %% Inputs
 
 % Angular search increment
-angincr = 6;
+angincr = 20;
 
 % Symmetry
 sym = 'C1';
 
 % Output name
-output_name = 'anglist_6deg_c1.csv';
+output_name = 'anglist_20deg_c1.csv';
 
 
 %% Calcualte symmetry restrictions
@@ -29,7 +29,7 @@ else
 end
 
 % Phi range
-if any(strcmpi(sym(1),{'c','d'}));
+if any(strcmpi(sym(1),{'c','d'}))
     if str2double(sym(2:end)) == 0
         phi_max = 0;
     else

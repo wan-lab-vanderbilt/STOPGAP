@@ -1,25 +1,29 @@
-function motl = sg_motl_randomize_eulers_by_symmetry(motl,symmetry)
+function motl = sg_motl_randomize_eulers_by_symmetry(motl,symmetry,output_name)
 %% sg_motl_randomize_eulers_by_symmetry
 % Take an input motivelist and apply a random symmetry operation to each
 % entry. This can help remove preferred orientation problems caused by
 % searching around only a symmetrical portion of angle space.
 %
-% WW 11-2019
+% WW 08-2023
 
 %% Check check
+
+% Read motl
+if ischar(motl)
+    motl = sg_motl_read2(motl);
+end
 
 % Check for C1
 if strcmpi(symmetry,'c1')
     return
 end
 
-% Check read type
-read_type = sg_motl_check_read_type(motl);
+
 
 %% Initialize
 
 % Determine number of entries
-motl_idx = unique([motl.motl_idx]);
+motl_idx = unique(motl.motl_idx);
 n_motl = numel(motl_idx);
 
 
@@ -43,13 +47,9 @@ end
 n_angles = numel(angles);
 
 
-% Parse euler angles
-switch read_type
-    case 1
-        eulers = cat(1,[motl.phi],[motl.psi],[motl.the])';
-    case 2
-        eulers = cat(2,motl.phi,motl.psi,motl.the);
-end
+% % Parse euler angles
+% eulers = cat(2,motl.phi,motl.psi,motl.the);
+
 
 
 %% Randomize angles
@@ -63,29 +63,25 @@ for i = 1:n_motl
     for j = 1:numel(idx)
         
         % Convert old angle
-        q1 = sg_euler2quaternion(eulers(idx(j),1),eulers(idx(j),2),eulers(idx(j),3));
+        q1 = sg_euler2quaternion(motl.phi(idx(j)),motl.psi(idx(j)),motl.the(idx(j)));
 
         % Pick random euler
         r = randi(n_angles);
         q2 = sg_euler2quaternion(angles{r}(1),angles{r}(2),angles{r}(3));
         
         % Generate new angle
-        temp_q = sg_quaternion_multiply(q2,q1);
+        temp_q = sg_quaternion_multiply(q1,q2);
         [phi,psi,the] = sg_quaternion2euler(temp_q);
         
         % Write output
-        switch read_type
-            case 1
-                motl(idx(j)).phi = phi;
-                motl(idx(j)).psi = psi;
-                motl(idx(j)).the = the;
-            case 2
-                motl.phi(idx(j)) = phi;
-                motl.psi(idx(j)) = psi;
-                motl.the(idx(j)) = the;
-        end
+        motl.phi(idx(j)) = phi;
+        motl.psi(idx(j)) = psi;
+        motl.the(idx(j)) = the;    
     end
 end
 
-
+%% Write output
+if nargin == 3
+    sg_motl_write2(output_name,motl);
+end
 

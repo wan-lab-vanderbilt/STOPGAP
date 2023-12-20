@@ -9,7 +9,7 @@ function pca_calculate_eigenvectors_final(p,o,s,idx)
 % WW 06-2019
 
 %% Initialize
-disp([s.nn,'Calculating final eigenvectors...']);
+disp([s.cn,'Calculating final eigenvectors...']);
 
 
 % Generate bandpass filters
@@ -37,7 +37,7 @@ cube_mask = sg_cube_mask(o.boxsize,3);
 
 
 %% Sum volumes
-disp([s.nn,'Summing volumes...']);
+disp([s.cn,'Summing volumes...']);
 
 % Loop through filter jobs
 for i = o.filt_jobs
@@ -115,7 +115,7 @@ end
 
 
 %% Write outputs
-disp([s.nn,'Writing outputs...']);
+disp([s.cn,'Writing outputs...']);
 
 % Write output volumes
 for i = o.filt_jobs
@@ -130,6 +130,6 @@ end
 
 % Write checkjob
 system(['touch ',p(idx).rootdir,'/',o.commdir,'/sg_pca_f_eigenvec_',num2str(o.procnum)]);
-disp([s.nn,'Final eigenvector calculation complete!!!']);
+disp([s.cn,'Final eigenvector calculation complete!!!']);
 
 

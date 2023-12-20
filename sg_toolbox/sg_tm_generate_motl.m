@@ -8,25 +8,25 @@
 %% Inputs
 
 % Root directory
-rootdir = '/fs/gpfs06/lv03/fileset01/pool/pool-plitzko/will_wan/jonathan/sg_0.7.1/tm_ribo/';
+rootdir = '/dors/wan_lab/home/wanw/research/HIV_testset/subset_from_scratch/subtomo/bin8/tm_4/';
 
 % Parameter file
 paramfilename = 'params/tm_param.star';
 
 % Processing indices
-proc_idx = 1;  % Which lines of the paramfile to process. Leave blank ([]) to process all indices.
+proc_idx = [1];  % Which lines of the paramfile to process. Leave blank ([]) to process all indices.
 
 
 % Output files
-output_motl = 'lists/allmotl_pdb_1.star';
+output_motl = 'lists/tomo5_cc025d5_1.star';
 split_halfsets=1;   % Split odd/even halfsets
 
 % Threshold parameters
-plot_values = true;        % Plot sorted values and take input threshold
-threshold = 0.35;
+plot_values = false;        % Plot sorted values and take input threshold
+threshold = 0.25;
 
 % Particle paramters
-d_cut = 8;     % Distance cutoff
+d_cut = 5;     % Distance cutoff
 cluster_size = [0,0];   % [min,max] values to define a cluster. Setting each parameter to 0 disables it.
 n_particles = 0;    % Number of particles to return. Set to 0 to disable.
 
@@ -268,7 +268,7 @@ for idx = proc_idx
 
     end
 
-    % Randomize Eulers by symmetry
+%     % Randomize Eulers by symmetry
     temp_motl = sg_motl_randomize_eulers_by_symmetry(temp_motl,tlist.symmetry);
 
     
@@ -276,6 +276,7 @@ for idx = proc_idx
     motl_cell{m} = temp_motl;
     m = m+1;
     
+    disp([num2str(numel(temp_motl.motl_idx)),' subtomogram positions found...']);
 end
 
 % Concatenate motivelists

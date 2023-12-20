@@ -16,14 +16,14 @@ function pca_watcher(rootdir,paramfilename,n_cores, submit_cmd)
 
 % Intialize settings struct
 s = struct();
-s.nn = 'Watcher: ';
+s.cn = 'Watcher: ';
 
 
 % Check input arguments
 if nargin == 3
     submit_cmd = [];
 elseif (nargin < 3) || (nargin > 4)
-    error([s.nn,'ACHTUNG!!! Incorrect number of inputs!!!']);
+    error([s.cn,'ACHTUNG!!! Incorrect number of inputs!!!']);
 end
 
 
@@ -50,10 +50,10 @@ disp('System dependencies checked!!!');
 
 
 % Read parameter file
-disp([s.nn,'Reading parameter file...']);
+disp([s.cn,'Reading parameter file...']);
 [p,idx] = update_pca_param(s,rootdir, paramfilename);
 if isempty(idx)
-    error([s.nn,'ACHTUNG!!! All jobs in .param file compelted!!!']);
+    error([s.cn,'ACHTUNG!!! All jobs in .param file compelted!!!']);
 end
 
 % Check tasks
@@ -64,7 +64,7 @@ end
 
 
 % Read settings
-disp([s.nn,'Reading settings...']);
+disp([s.cn,'Reading settings...']);
 s = sg_get_pca_settings(s,p(idx).rootdir,'pca_settings.txt');
     
 
@@ -98,11 +98,11 @@ if ~isempty(submit_cmd)
     system(['rm -f ',p(idx).rootdir,'/',o.commdir,'/*']);
     
     
-    disp([s.nn,'Submitting job...']);
+    disp([s.cn,'Submitting job...']);
     system(submit_cmd);
 else
     
-    disp([s.nn,'No submission command given... Watching pre-submitted job...']);
+    disp([s.cn,'No submission command given... Watching pre-submitted job...']);
     
 end
 
@@ -120,23 +120,23 @@ while run
     switch p(idx).pca_task
 
         case 'rot_vol'
-            disp([s.nn,'STOPGAP PCA performing volume pre-rotation!!!']);
+            disp([s.cn,'STOPGAP PCA performing volume pre-rotation!!!']);
             watch_rot_vol(p,o,s,idx);
 
         case 'calc_ccmat'
-            disp([s.nn,'STOPGAP PCA calculating CC-matrix!!!']);
+            disp([s.cn,'STOPGAP PCA calculating CC-matrix!!!']);
             watch_ccmat(p,o,s,idx);
 
         case 'calc_pca_ccmat'
-            disp([s.nn,'STOPGAP PCA calculating PCA, Eigenvolumes, and Eigenvalues!!!']);
+            disp([s.cn,'STOPGAP PCA calculating PCA, Eigenvolumes, and Eigenvalues!!!']);
             watch_pca_ccmat(p,o,s,idx);
         
         case 'calc_covar'
-            disp([s.nn,'STOPGAP PCA calculating covariance matrix!!!']);
+            disp([s.cn,'STOPGAP PCA calculating covariance matrix!!!']);
             watch_covar(p,o,s,idx);
             
         otherwise
-            error([s.nn,'ACHTUNG!!! Unsupported PCA task!!!']);
+            error([s.cn,'ACHTUNG!!! Unsupported PCA task!!!']);
 
         
 
@@ -162,21 +162,21 @@ function watch_rot_vol(p,o,s,idx)
 
     % Load motivelist
     motl_name = [o.listdir,'/',p(idx).motl_name,'_',num2str(p(idx).iteration),'.star'];
-    disp([s.nn,'Reading motivelist: ',motl_name]);
+    disp([s.cn,'Reading motivelist: ',motl_name]);
     motl = sg_motl_read2([p(idx).rootdir,'/',motl_name]);
     n_subtomos = numel(unique(motl.subtomo_num));
     clear motl
     
-    disp([s.nn,'Starting to prerotate volumes...']);
+    disp([s.cn,'Starting to prerotate volumes...']);
     
     % Wait for rotations
     watch_progress(p,o,s,idx,'rotvolprog',n_subtomos,false,'subtomograms rotated...',20);
     
 
     % Wait for completion
-    fprintf('\n%s\n',[s.nn,'All volumes rotated!!! Cleaning up after step...']);
+    fprintf('\n%s\n',[s.cn,'All volumes rotated!!! Cleaning up after step...']);
     wait_for_it([p(idx).rootdir,'/',o.commdir],'complete_sg_pca_rotvol',s.wait_time);
-    fprintf('\n\n%s\n\n',[s.nn,'STOPGAP PCA pre-rotation completed!!!']);
+    fprintf('\n\n%s\n\n',[s.cn,'STOPGAP PCA pre-rotation completed!!!']);
 
 end
 
@@ -188,7 +188,7 @@ function watch_ccmat(p,o,s,idx)
 
     % Load motivelist
     motl_name = [o.listdir,'/',p(idx).motl_name,'_',num2str(p(idx).iteration),'.star'];
-    disp([s.nn,'Reading motivelist: ',motl_name]);
+    disp([s.cn,'Reading motivelist: ',motl_name]);
     motl = sg_motl_read2([p(idx).rootdir,'/',motl_name]);
     n_subtomos = numel(unique([motl.subtomo_num]));
     clear motl
@@ -196,16 +196,16 @@ function watch_ccmat(p,o,s,idx)
     % Calculate pairs
     n_pairs = ((n_subtomos^2)/2)-(n_subtomos/2);
     
-    disp([s.nn,'Calculating pairwise cross-correlations...']);
+    disp([s.cn,'Calculating pairwise cross-correlations...']);
     
     % Wait for rotations
     watch_progress(p,o,s,idx,'ccmatprog',n_pairs,false,'pairwise correlations calculated...',20);
     
 
     % Wait for completion
-    fprintf('\n%s\n',[s.nn,'Parallel computations complete... waiting for final CC-matrices...']);
+    fprintf('\n%s\n',[s.cn,'Parallel computations complete... waiting for final CC-matrices...']);
     wait_for_it([p(idx).rootdir,'/',o.commdir],['complete_sg_pca_ccmat_',num2str(idx)],s.wait_time);
-    fprintf('\n\n%s\n\n',[s.nn,'STOPGAP PCA CC-matrix completed!!!']);
+    fprintf('\n\n%s\n\n',[s.cn,'STOPGAP PCA CC-matrix completed!!!']);
 
 
 end
@@ -218,7 +218,7 @@ function watch_covar(p,o,s,idx)
 
     % Load motivelist
     motl_name = [o.listdir,'/',p(idx).motl_name,'_',num2str(p(idx).iteration),'.star'];
-    disp([s.nn,'Reading motivelist: ',motl_name]);
+    disp([s.cn,'Reading motivelist: ',motl_name]);
     motl = sg_motl_read2([p(idx).rootdir,'/',motl_name]);
     n_subtomos = numel(unique(motl.subtomo_num));
     clear motl 
@@ -233,16 +233,16 @@ function watch_covar(p,o,s,idx)
     
     
     %%% Final covaraince %%%
-    fprintf('\n%s\n',[s.nn,'All subtomograms processed!!! Waiting for final covariance matrices...']);
+    fprintf('\n%s\n',[s.cn,'All subtomograms processed!!! Waiting for final covariance matrices...']);
 
 
     % Wait until final averaging completion
     watch_for_files(p,o,s,idx,'sg_pca_covarmat',o.n_filt,' covariance matrices completed...');
-    fprintf('\n%s\n',[s.nn,'STOPGAP PCA covariance matrices calculated!!! Cleaning up iteration']);
+    fprintf('\n%s\n',[s.cn,'STOPGAP PCA covariance matrices calculated!!! Cleaning up iteration']);
 
     % Wait for completion
     wait_for_it([p(idx).rootdir,'/',o.commdir],'complete_sg_pca_covar',s.wait_time);
-    fprintf('\n\n%s\n\n',[s.nn,'STOPGAP PCA covariance-matrix completed!!!']);
+    fprintf('\n\n%s\n\n',[s.cn,'STOPGAP PCA covariance-matrix completed!!!']);
 
 end
 
@@ -254,7 +254,7 @@ function watch_pca_covar(p,o,s,idx)
 
     % Load motivelist
     motl_name = [o.listdir,'/',p(idx).motl_name,'_',num2str(p(idx).iteration),'.star'];
-    disp([s.nn,'Reading motivelist: ',motl_name]);
+    disp([s.cn,'Reading motivelist: ',motl_name]);
     motl = sg_motl_read([p(idx).rootdir,'/',motl_name]);
     subtomos = unique([motl.subtomo_num]);
     n_subtomos = numel(subtomos);
@@ -323,7 +323,7 @@ function watch_pca_ccmat(p,o,s,idx)
 
     % Load motivelist
     motl_name = [o.listdir,'/',p(idx).motl_name,'_',num2str(p(idx).iteration),'.star'];
-    disp([s.nn,'Reading motivelist: ',motl_name]);
+    disp([s.cn,'Reading motivelist: ',motl_name]);
     motl = sg_motl_read2([p(idx).rootdir,'/',motl_name]);
     n_subtomos = numel(unique(motl.subtomo_num));
     clear motl
@@ -334,7 +334,7 @@ function watch_pca_ccmat(p,o,s,idx)
 
     % Wait until parallel averaging completion
     watch_for_files(p,o,s,idx,'sg_pca_eigenfactors',o.n_filt,' PCA calculations completed...');
-    fprintf('\n%s\n',[s.nn,'STOPGAP PCA eigenfactors determined!!!']);
+    fprintf('\n%s\n',[s.cn,'STOPGAP PCA eigenfactors determined!!!']);
             
 
     
@@ -352,7 +352,7 @@ function watch_pca_ccmat(p,o,s,idx)
     
     
     % Wait for step to complete
-    fprintf('\n%s\n',[s.nn,'All subtomograms aligned!!! Waiting for final eigenvolumes...']);
+    fprintf('\n%s\n',[s.cn,'All subtomograms aligned!!! Waiting for final eigenvolumes...']);
     
     
     %%% Final averaging %%%
@@ -360,7 +360,7 @@ function watch_pca_ccmat(p,o,s,idx)
 
     % Wait until final averaging completion
     watch_for_files(p,o,s,idx,'sg_pca_f_eigenvec',o.n_filt,' eigenvolume sets completed...');
-    fprintf('\n%s\n',[s.nn,'STOPGAP PCA eigenvectors calculated!!! Cleaning up iteration']);
+    fprintf('\n%s\n',[s.cn,'STOPGAP PCA eigenvectors calculated!!! Cleaning up iteration']);
     
     wait_for_it([p(idx).rootdir,'/',o.commdir],'complete_sg_pca_eigenvec',s.wait_time);
     fprintf(['\n','Eigenvolume calculation complete!!!\n']);
@@ -372,7 +372,7 @@ function watch_pca_ccmat(p,o,s,idx)
     
     % Wait for all subtomograms
     watch_progress(p,o,s,idx,'eigenvalprog',n_subtomos,false,'subtomograms processed...',20);
-    fprintf('\n%s\n',[s.nn,'STOPGAP PCA eigenvalues determined!!! Cleaning up iteration']);
+    fprintf('\n%s\n',[s.cn,'STOPGAP PCA eigenvalues determined!!! Cleaning up iteration']);
 
     wait_for_it([p(idx).rootdir,'/',o.commdir],'complete_sg_pca_eigenval',s.wait_time);
     fprintf(['\n','Eigenvalue calculation complete!!!\n']);

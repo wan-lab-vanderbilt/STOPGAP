@@ -27,6 +27,14 @@ switch step
     case 'avg'
         fname = {'avg_reffiltername','avg_particlefiltername'};    
         shift = false;
+        
+        % Check for super sampling
+        if o.avg_ss > 1
+            boxsize = o.ss_boxsize;
+        else
+            boxsize = o.boxsize;
+        end
+        
     otherwise
         error('Achtung!!! Incorrect mode for "refresh_filters"');
 end
@@ -60,28 +68,24 @@ if f.tomo ~= motl.tomo_num(1)
     
     % Update tomogram number
     f.tomo = motl.tomo_num(1);
-    new_tomo = true;
-        
+    new_tomo = true;    
+    
     % Wedgelist index
     f.wedge_idx = find([o.wedgelist.tomo_num] == motl.tomo_num(1));
 
     % Calcualte binary mask, slice indices, and slice weights
     switch step
         case 'ali'
-            [f.bin_wedge,f.wedge_weight,f.slice_idx] = generate_wedgemask_slices(o.boxsize,o.wedgelist(f.wedge_idx).tilt_angle,o.bpf,shift);
+            f = generate_wedgemask_slices(f,o.boxsize,o.wedgelist(f.wedge_idx).tilt_angle,o.bpf,shift);
         case 'avg'
-            if o.avg_ss > 1
-                boxsize = o.ss_boxsize;
-            else
-                boxsize = o.boxsize;
-            end
-            bpf = sg_sphere(boxsize,floor(min(boxsize/2))-1);
-            [f.bin_wedge,f.wedge_weight,f.slice_idx] = generate_wedgemask_slices(boxsize,o.wedgelist(f.wedge_idx).tilt_angle,bpf,shift);
+            f = generate_wedgemask_slices(f,boxsize,o.wedgelist(f.wedge_idx).tilt_angle,o.lpf,shift);
     end
-   
+    
+    
     % Set reference and particle filters
     f.rfilt = f.bin_wedge;
     f.pfilt = f.bin_wedge;
+
       
 else
     
@@ -89,6 +93,8 @@ else
     new_tomo = false;       
     
 end
+
+
 
 % Check for new subtomogram
 if f.subtomo ~= motl.subtomo_num(1)    
@@ -162,6 +168,7 @@ if f.calc_exp
 
 end
 
+
 % Generate CTF filter
 if f.calc_ctf        
     
@@ -172,7 +179,7 @@ if f.calc_ctf
     f.rfilt = f.rfilt.*f.ctf_filt;    
 
 end
-   
+
 
 % Refresh Cosine filter
 if f.calc_cosine
@@ -207,5 +214,4 @@ if f.calc_sbw
     
 end
 
-    
 

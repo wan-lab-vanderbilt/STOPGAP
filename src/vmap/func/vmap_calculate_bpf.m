@@ -29,7 +29,7 @@ end
 %% Generate filter
 
     
-disp([s.nn,'Caculating bandpass filter...']);
+disp([s.cn,'Caculating bandpass filter...']);
 
 
 % Generate filter

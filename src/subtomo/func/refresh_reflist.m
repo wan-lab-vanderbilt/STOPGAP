@@ -31,8 +31,15 @@ if refresh
         
         % Load list
         case '.star'
-            disp([s.nn,'Reference list detected... Loading reflist: ',p(idx).ref_name]);
-            o.reflist = sg_reflist_read([p(idx).rootdir,'/',o.listdir,'/',p(idx).ref_name]);
+            disp([s.cn,'Reference list detected... Loading reflist: ',p(idx).ref_name]);
+                       
+            % Check for local copy
+            if o.copy_local
+                copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/','reflist_copied',s.wait_time,[o.listdir,p(idx).ref_name],false);
+            end
+    
+            % Read reflist
+            o.reflist = sg_reflist_read([o.rootdir,'/',o.listdir,'/',p(idx).ref_name]);
             
         % Generate list
         case ''

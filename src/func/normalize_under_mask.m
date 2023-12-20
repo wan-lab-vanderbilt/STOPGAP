@@ -13,8 +13,11 @@ m_idx = mask > 0;
 n_pix = sum(mask(:));   % Pixels under mask
 
 % Calcualte stats
-m = mean(ref(m_idx));
-s = std(ref(m_idx));
+% m = mean(ref(m_idx));
+% s = std(ref(m_idx));
+m = mean(ref(m_idx).*mask(m_idx));
+s = std(ref(m_idx).*mask(m_idx));
+
 
 % Normalize reference
 ref = ref - m;

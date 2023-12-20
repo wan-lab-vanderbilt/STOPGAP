@@ -9,7 +9,7 @@ function complete_pca_ccmatrix(p,o,s,idx,paramfilename)
 
 % Wait for compiling to finish
 wait_for_them([p(idx).rootdir,'/',o.commdir],'sg_pca_ccmatrix',o.n_filt,s.wait_time);
-disp([s.nn,'STOPGAP PCA CC-matrix calculation complete... Compiling timings...']);
+disp([s.cn,'STOPGAP PCA CC-matrix calculation complete... Compiling timings...']);
 
 % Compile times
 compile_pca_timings(paramfilename,p,o,idx,'p_ccmat');
@@ -27,4 +27,4 @@ system(['rm -f ',p(idx).rootdir,'/',o.tempdir,'/timer_p_ccmat*']);
 
 % Write completion file
 system(['touch ',p(idx).rootdir,'/',o.commdir,'/complete_sg_pca_ccmat_',num2str(idx)]);
-disp([s.nn,'PCA CC-matrix calculation complete!!!']);
+disp([s.cn,'PCA CC-matrix calculation complete!!!']);

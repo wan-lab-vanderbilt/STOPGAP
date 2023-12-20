@@ -21,7 +21,7 @@ if sg_check_param(p(idx),'calc_ctf')
     if isfield(o.wedgelist,'defocus') && isfield(o.wedgelist,'pixelsize')     
         f.calc_ctf = true;       
     else
-        error([s.nn,'ACHTUNG!!! Insufficent wedgelist information to calculate CTF filter!!!']);
+        error([s.cn,'ACHTUNG!!! Insufficent wedgelist information to calculate CTF filter!!!']);
     end          
 end
 
@@ -32,7 +32,7 @@ if sg_check_param(p(idx),'calc_exp')
     if isfield(o.wedgelist,'exposure') && isfield(o.wedgelist,'pixelsize') 
         f.calc_exposure = true;   
     else
-        error([s.nn,'ACHTUNG!!! Insufficent wedgelist information to calculate exposure filter!!!']);
+        error([s.cn,'ACHTUNG!!! Insufficent wedgelist information to calculate exposure filter!!!']);
     end
 end
 

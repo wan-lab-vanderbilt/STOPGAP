@@ -9,14 +9,14 @@ function stopgap_parallel_tm(p,o,s,idx)
 % WW 04-2019
 
 %% Initialize volumes and filters
-disp([s.nn,'Initializing volumes for template matching...']);
+disp([s.cn,'Initializing volumes for template matching...']);
 
 
 % Initialize volume struct
 v = struct();
 
 % Read in tile
-disp([s.nn,'Reading tile...']);
+disp([s.cn,'Reading tile...']);
 v.tile = read_tm_tiles(p,o,idx,'tomo');
 
 % Determine cropped size
@@ -39,7 +39,7 @@ end
 
 
 % Initialize filter array
-disp([s.nn,'Generating filters...']);
+disp([s.cn,'Generating filters...']);
 f = generate_tm_filters(p,o,s,idx);
 
 % Open progress file
@@ -47,13 +47,13 @@ prog = fopen([p(idx).rootdir,o.commdir,'ptmprog_',num2str(o.procnum)],'w');
 
 
 % Prepare tiles
-disp([s.nn,'Preparing tiles...']);
+disp([s.cn,'Preparing tiles...']);
 v = prepare_tiles_tm(p,idx,o,f,v);
 
 
 
 %% Perform template matching
-disp([s.nn,'Performing parallel template matching on tomogram ',num2str(p(idx).tomo_num),'...']);
+disp([s.cn,'Performing parallel template matching on tomogram ',num2str(p(idx).tomo_num),'...']);
 tot_ang = sum(o.n_ang);
 
 % Initialize counter
@@ -179,7 +179,7 @@ for i = 1:o.n_tmpl
         % Increment completion counter
         [pc,rt_str] = progress_counter(pc,'count',tot_ang,s.counter_pct);
         if ~isempty(rt_str)
-            disp([s.nn,'Job progress: ',num2str(pc.c),' out of ',num2str(tot_ang),' angles matched... ',rt_str]);
+            disp([s.cn,'Job progress: ',num2str(pc.c),' out of ',num2str(tot_ang),' angles matched... ',rt_str]);
         end                   
 
         % Write job progress
@@ -194,33 +194,46 @@ fclose(prog);
 
 
 %% Write outputs
-disp([s.nn,'Matching complete!!! Writing outputs...']);
+disp([s.cn,'Matching complete!!! Writing outputs...']);
     
 % Generate names
 s_name = [s.tempdir,p(idx).smap_name,'_',num2str(p(idx).tomo_num),'_',num2str(o.procnum),s.vol_ext];
 o_name = [s.tempdir,p(idx).omap_name,'_',num2str(p(idx).tomo_num),'_',num2str(o.procnum),s.vol_ext];    
 
 % Write output
-write_vol(s,o,p(idx).rootdir,s_name,v.s_map);
-write_vol(s,o,p(idx).rootdir,o_name,v.o_map);
+write_vol(s,o,o.rootdir,s_name,v.s_map);
+disp([s.cn,o.rootdir,s_name,' written...']);
+write_vol(s,o,o.rootdir,o_name,v.o_map);
+disp([s.cn,o.rootdir,o_name,' written...']);
+% write_vol(s,o,p(idx).rootdir,s_name,v.s_map);
+% disp([s.cn,p(idx).rootdir,s_name,' written...']);
+% write_vol(s,o,p(idx).rootdir,o_name,v.o_map);
+% disp([s.cn,p(idx).rootdir,o_name,' written...']);
 
 % Write noise map
 if o.noise_corr
     n_name = [s.tempdir,'noise_',p(idx).smap_name,'_',num2str(p(idx).tomo_num),'_',num2str(o.procnum),s.vol_ext];
-    write_vol(s,o,p(idx).rootdir,n_name,v.n_map);    
+    write_vol(s,o,o.rootdir,n_name,v.n_map);    
+%     write_vol(s,o,p(idx).rootdir,n_name,v.n_map);
+    disp([s.cn,o.rootdir,n_name,' written...']);
 end
 
 if o.n_tmpl > 1
     t_name = [s.tempdir,p(idx).tmap_name,'_',num2str(p(idx).tomo_num),'_',num2str(o.procnum),s.vol_ext];
-    write_vol(s,o,p(idx).rootdir,t_name,v.t_map);
+    write_vol(s,o,o.rootdir,t_name,v.t_map);
+%     write_vol(s,o,p(idx).rootdir,t_name,v.t_map);
+    disp([s.cn,o.rootdir,t_name,' written...']);
 end
 
     
-
+% Write local checkjob
+if o.copy_local
+    system(['touch ',o.rootdir,'copy_comm/sg_ptm_',o.tomo_num,'_',num2str(o.local_id)]);
+end
 
 % Write checkjob
 system(['touch ',p(idx).rootdir,o.commdir,'sg_ptm_',o.tomo_num,'_',num2str(o.procnum)]);
-    
+disp([s.cn,'Parallel template matching complete!!!']);    
 
 
 

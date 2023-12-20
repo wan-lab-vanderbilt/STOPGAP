@@ -13,6 +13,10 @@ switch task
         disp('Parsing subtomogram alignment/averaging parameters...');
         subtomo_parser(varargin{:});
         
+    case 'extract'
+        disp('Parsing subtomogram extraction parameters...');
+        extract_parser(varargin{:});
+        
     case 'temp_match'
         disp('Parsing template matching parameters...');
         tm_parser(varargin{:});
@@ -24,6 +28,10 @@ switch task
     case 'vmap'
         disp('Parsing variance map parameters...');
         stopgap_vmap_parser(varargin{:});
+        
+    case 'tps'
+        disp('Parsing tube power spectrum parameters...');
+        tps_parser(varargin{:});
         
     otherwise
         error('ACHTUNG!!! Invalid task!!!');

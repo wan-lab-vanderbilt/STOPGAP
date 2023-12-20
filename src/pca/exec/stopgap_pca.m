@@ -27,19 +27,19 @@ if (ischar(n_cores)); n_cores=eval(n_cores); end
 s = struct();
 
 % Initialize node name
-s.nn = ['Node',num2str(procnum),': '];
+s.cn = ['Node',num2str(procnum),': '];
 
-disp([s.nn,'Initializing...']);
+disp([s.cn,'Initializing...']);
 
 % Read parameter file
-disp([s.nn,'Reading parameter file...']);
+disp([s.cn,'Reading parameter file...']);
 [p,idx] = update_pca_param(s,rootdir, paramfilename);
 if isempty(idx)
-    error([s.nn,'ACHTUNG!!! All jobs in .param file compelted!!!']);
+    error([s.cn,'ACHTUNG!!! All jobs in .param file compelted!!!']);
 end
 
 % Read settings
-disp([s.nn,'Reading settings...']);
+disp([s.cn,'Reading settings...']);
 s = sg_get_pca_settings(s,p(idx).rootdir,'pca_settings.txt');
 
 
@@ -90,7 +90,7 @@ while run
             calc_covar(p,o,s,idx,paramfilename);
             
         otherwise
-            error([s.nn,'ACHTUNG!!! Unsupported PCA task!!!']);
+            error([s.cn,'ACHTUNG!!! Unsupported PCA task!!!']);
         
 
     end
@@ -139,7 +139,7 @@ function calc_ccmat(p,o,s,idx,paramfilename)
 
 % Check for defined parameter
 if ~sg_check_param(p(idx),'ccmat_name')
-    error([s.nn,'ACHTUNG!!! Cannot calculate CC-matrix!!! ccmat_name is undefined!!!']);
+    error([s.cn,'ACHTUNG!!! Cannot calculate CC-matrix!!! ccmat_name is undefined!!!']);
 end
 
 if o.procnum==1
@@ -286,7 +286,7 @@ function calc_covar(p,o,s,idx,paramfilename)
 
 % Check for defined parameter
 if ~sg_check_param(p(idx),'covar_name')
-    error([s.nn,'ACHTUNG!!! Cannot calculate covariance-matrix!!! covar_name is undefined!!!']);
+    error([s.cn,'ACHTUNG!!! Cannot calculate covariance-matrix!!! covar_name is undefined!!!']);
 end
 
 if o.procnum==1

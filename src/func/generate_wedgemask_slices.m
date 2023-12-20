@@ -1,4 +1,4 @@
-function [bin_wedge, wedge_weight, slice_idx] = generate_wedgemask_slices(boxsize,tilts,bpf,shift)
+function f = generate_wedgemask_slices(f,boxsize,tilts,bpf,shift)
 %% generate_wedgemask_slices
 % Generate wedgemasks as a set of 2D-slices. Input parametes are input
 % boxsize, input tilt-angles, bandpass filter, and whether to apply an
@@ -11,19 +11,30 @@ function [bin_wedge, wedge_weight, slice_idx] = generate_wedgemask_slices(boxsiz
 % For non-cubic volumes, the XZ-slices are calculated using the largest
 % dimension and Fourier cropped to the non-square size. 
 %
+% NOTE: there are a few inconsistent memory leak issues here. There can be
+% a leak when generating the slice_idx and when generating the 3D wedge
+% weight. This becomes a big issue if you are repeatedly recalculating the
+% wedgemasks slices (I found this issue with a mangled motivelist that had
+% the tomo_num changing at every entry). In practice, this may not be an
+% actual issue; i.e. I haven't figured out how to fix it.
+%
 % WW 06-2019
 
 %% Check check
 
 % Check for fft-shift
-if nargin < 4
+if nargin < 5
     shift = false;
 end
 
 % Check for bandpass filter
-if nargin < 3
+if nargin < 4
     bpf = ones(boxsize,'single');
 end
+
+% Preset binarization cutoff
+b_cut = exp(-2);
+
 
 %% Generate XZ-slice
 
@@ -37,14 +48,14 @@ max_xz = max(boxsize([1,3]));
 slice = zeros(max_xz,max_xz,'single');
 slice(:,floor(max_xz/2)+1) = 1;
 
-
+    
 %% Generate slices
 
 % Number of tilts
 n_tilts = numel(tilts);
 
 % Slice indices
-slice_idx = cell(n_tilts,1);
+f.slice_idx = cell(n_tilts,1);
 
 % Sum volume
 sum_slice= zeros(boxsize([1,3]),'single');
@@ -53,14 +64,14 @@ sum_slice= zeros(boxsize([1,3]),'single');
 for i = 1:n_tilts
     
     % Rotate slice
-    rslice = tom_rotate(slice,tilts(i));
-    rslice = single(rslice>exp(-2));
+    rslice = tom_rotate_mod(slice,tilts(i));
+    rslice = single(rslice > b_cut);
     
     % Fourier crop
     if ~square
         rslice = sg_crop_image(fftshift(fft2(rslice)),boxsize([1,3]));
         rslice = real(ifft2(ifftshift(rslice)));
-        rslice = single(rslice>exp(-2));
+        rslice = single(rslice > b_cut);
     end
     
     % Sum slice
@@ -78,7 +89,7 @@ for i = 1:n_tilts
     proj = proj.*bpf;
     
     % Save indices
-    slice_idx{i} = find(proj > 0); 
+    f.slice_idx{i} = find(proj > 0); 
     
 end
 
@@ -93,17 +104,18 @@ slice_wei(bin_slice) = 1./sum_slice(bin_slice);
 
 
 % Generate binary wedge
-bin_wedge = single(permute(repmat(bin_slice,[1,1,boxsize(2)]),[1,3,2]));
+f.bin_wedge = single(permute(repmat(bin_slice,[1,1,boxsize(2)]),[1,3,2]));
+
 
 % Generate 3D wedge weight
-wedge_weight = permute(repmat(slice_wei,[1,1,boxsize(2)]),[1,3,2]);
+f.wedge_weight = permute(repmat(slice_wei,[1,1,boxsize(2)]),[1,3,2]);
 
 % Check FFT shift
 if shift
-    bin_wedge = ifftshift(bin_wedge);
-    wedge_weight = ifftshift(wedge_weight);
+    f.bin_wedge = ifftshift(f.bin_wedge);
+    f.wedge_weight = ifftshift(f.wedge_weight);
 end
-    
+   
     
     
 

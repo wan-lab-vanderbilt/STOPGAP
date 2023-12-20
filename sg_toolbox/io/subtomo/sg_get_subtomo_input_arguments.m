@@ -75,7 +75,7 @@ param.filters = {'calc_exp', 'calc_ctf', 'cos_weight',  'score_weight';
               
 % Other parameters              
 param.other = {'symmetry', 'score_thresh', 'subset', 'avg_mode', 'ignore_halfsets', 'temperature', 'rot_mode', 'fthresh', 'avg_ss';
-               'str',      'num',          'num',    'str',      'boo',             'num',         'str',      'num',     'boo';
+               'str',      'num',          'num',    'str',      'boo',             'num',         'str',      'num',     'num';
                'nrq',      'nrq',          'nrq',    'nrq',      'nrq',             'nrq',         'nrq',      'nrq',     'nrq'};
            
 

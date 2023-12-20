@@ -1,158 +1,234 @@
+function sg_motl_batch_tube(tomolist_name,motl_name,radlist_name,metadata_type,binning,l_dist,c_dist,padding,subset_list,helical_step)
 %% sg_motl_batch_tube
-% A function to batch generate motivelists for a set of tubes. 
+% A function to batch generate motivelists for a set of tubes. Input data
+% is parsed from a TOMOMAN tomolist and metadata type.
 %
-% The input folder should contain a subfolder for each tomogram; each
-% folder should be named after the tomogram number. Within each folder
-% there should be a set of .cmm file containing tube centers, as picked
-% from chimera's volume tracer. Each .cmm file should be named
-% [root_name]_[tomo_num]_[obj_number].cmm. Radii can be supplied as a 
-% single value or using a three column text file with columns tomo number,
-% tube number and radius.
+% The metadata subfolder should contain .em files, each containg tube 
+% centers and radii, as defined by Kun Qu's "pick particle" Chimera plugin. 
+%
+% "binning" is the binning of the input files
+%
+% "l_dist" is the inter-particle along the length of the tube.
+%
+% "c_dist" is the inter-particle along the circumference of the tube.
+%
+% "rand_phi" randomizes the in-plane phi angles.
+%
+% "padding" removes positions that are within a certain number of voxels
+% from the tomogram edges.
+%
+% "subset_list" is the name of an input plain-text file for a list of
+% tomograms to work on. The list should contain the tomo_num of the
+% tomograms to use.
+%
+% "helical_step" defines rotation between lateral rings on the tube
+% surface.
 % 
-% Points can also be thresholded with respect to tomogram boundaries.
 %
-% WW 07-2018
-
-%% Inputs
-
-% Input folder
-metadata_folder = '/fs/gpfs06/lv03/fileset01/pool/pool-plitzko/will_wan/2017/2017-12-15_gasv/subtomo2/metadata/';
-
-% Center root name
-tracer_root = 'clicker';
-tracer_type = 'txt';    % txt or cmm
-
-% Reconstruction list
-rlist_name = 'recons_list.txt';
-
-% Distances
-l_dist = 2.5;    % Distance along tube axis
-c_dist = 1.5;    % Distance around tube axis
-
-% Radii 
-rad = 76;
-
-% Tomogram dir
-tomo_dir = '/fs/pool/pool-plitzko/will_wan/2017/2017-12-15_gasv/tomos/bin8_white_ctffind/';
-digits = 2;
-padding = 10;    % Size of the edge boundary for thresholding; any centers within the boundary are removed.
-
-% Output name
-output_name = 'allmotl_1.star';
+% WW 08-2022
 
 
-%% Initialize
+% % % %%%% DEBUG
+% tomolist_name = 'tomolist.mat';
+% motl_name = 'motl/tomo2_init_tube_2.star';
+% radlist_name = 'motl/tomo2_init_radlist_2.txt';
+% metadata_type = 'init_tube_2';
+% binning = 4;
+% l_dist = 4;
+% c_dist = 3;
+% padding = 32;
+% subset_list = [];
 
-% Read reconstructin list
-rlist = dlmread(rlist_name);
-n_tomos = numel(rlist);
+%% Check check
 
-
-% Initialize cell array
-motl_cell = cell(n_tomos,1);
-
-% % Check radii
-% if ischar(rad)
-%     % Read list
-%     rad_array = dlmread(rad);
-% elseif isnumeric(rad)
-%     % Assign constant radius
-%     rad_array = ones(n_tr,3).*rad;
-%     % Parse tomo and tube numbers
-%     for i = 1:n_tr        
-%         [~,tr_name,~] = fileparts(tr_dir(i).name);
-%         tr_parts = strsplit(tr_name,'_');
-%         rad_array(i,1) = str2double(tr_parts{2});
-%         rad_array(i,2) = str2double(tr_parts{3});
-%     end
-% end
-      
-% Parse numeric format for tomogram names
-nfmt = ['%0',num2str(digits),'i'];
-
-
-%% Generate motls for each tube
-
-for i = 1:n_tomos
-    
-    % Determine number of tracer files
-    tr_dir = dir([metadata_folder,'/',num2str(rlist(i),['%0',num2str(digits),'i']),'/',tracer_root,'_*.',tracer_type]);
-    
-    % Read tracer
-    switch tracer_type
-        case 'txt'
-            tr = dlmread([metadata_folder,'/',num2str(rlist(i),['%0',num2str(digits),'i']),'/',tr_dir.name]);
-            tr_idx = unique(tr(:,1));
-            n_tr = numel(tr_idx);
-        case 'cmm'
-            tr = sg_cmm_read([metadata_folder,'/',tracer_root,'_',num2str(rad_array(j,1)),'_',num2str(rad_array(j,2)),'.cmm']);
-    end
-    
-    tomo_cell = cell(n_tr,1);
-    
-    for j = 1:n_tr
-        
-
-        % Parse points
-        switch tracer_type
-            case 'txt'
-                p_idx = tr(:,1) == tr_idx(j);
-                points = tr(p_idx,2:4);
-        end
-
-        % Get surface positions
-        [positions,eulers] = sg_motl_generate_tube_function(points',l_dist,c_dist,rad);
-        n_pos = size(positions,2);
-
-        % Parse positions
-        x = round(positions(1,:));
-        y = round(positions(2,:));
-        z = round(positions(3,:));
-        x_shift = positions(1,:) - x;
-        y_shift = positions(2,:) - y;
-        z_shift = positions(3,:) - z;
-
-        % Generate motivelist
-        temp_motl = sg_initialize_motl(n_pos);
-        temp_motl = sg_motl_fill_field(temp_motl,'tomo_num',rlist(i));
-        temp_motl = sg_motl_fill_field(temp_motl,'object',tr_idx(j));
-        temp_motl = sg_motl_fill_field(temp_motl,'orig_x',x);
-        temp_motl = sg_motl_fill_field(temp_motl,'orig_y',y);
-        temp_motl = sg_motl_fill_field(temp_motl,'orig_z',z);
-        temp_motl = sg_motl_fill_field(temp_motl,'x_shift',x_shift);
-        temp_motl = sg_motl_fill_field(temp_motl,'y_shift',y_shift);
-        temp_motl = sg_motl_fill_field(temp_motl,'z_shift',z_shift);
-        temp_motl = sg_motl_fill_field(temp_motl,'phi',eulers(1,:));
-        temp_motl = sg_motl_fill_field(temp_motl,'psi',eulers(2,:));
-        temp_motl = sg_motl_fill_field(temp_motl,'the',eulers(3,:));
-
-        % Threshold list
-        tomo_name = [tomo_dir,'/',num2str(rad_array(j,1),nfmt),'.rec'];
-        temp_motl = sg_motl_check_tomo_edges(tomo_name,temp_motl,padding);
-
-        % Store motl
-        tomo_cell{j} = temp_motl;
-    end
-    
-    motl_cell{i} = cat(1,tomo_cell{:});
+% Check for subset list
+if nargin < 9
+    subset = [];
+elseif isempty(subset_list)
+    subset = [];
+else
+    % Read subset list
+    subset = dlmread(subset_list);
 end
 
-%% Generate complete motl
+% Check for helical rotation
+if nargin <= 9
+    helical_step = [];
+end
 
-% Concatenate full motl
-motl = cat(1,motl_cell{:});
-n_motl = numel(motl);
+%% Initalize
 
-% Fill subtomo number      
-motl = sg_motl_fill_field(motl,'subtomo_num',1:n_motl);
-motl = sg_motl_fill_field(motl,'halfset','A');
-motl = sg_motl_fill_field(motl,'score',0);
-motl = sg_motl_fill_field(motl,'class',1);
+% Read tomolist
+tomolist = tm_read_tomolist([],tomolist_name);
+n_tomos = numel(tomolist);
 
-% Write output
-sg_motl_write(output_name,motl);
+% Cell to hold motl from each tomogram
+tomo_cell = cell(n_tomos,1);
+tomo_cell_idx = false(n_tomos,1);
 
+% Cell to hold radii for each tomogram
+rad_cell = cell(n_tomos,1);
 
+%% Generate spheres for each tomogram
+m_idx_start = 1;
+subtomo_num = 1;
+
+% Loop through tomograms
+for i = 1:n_tomos
+    
+    % Check processing
+    process = true;
+    if tomolist(i).skip
+        process = false;        
+    end
+    if ~isempty(subset)
+        if ~any(tomolist(i).tomo_num == subset)
+            process = false;
+        end
+    end
+    if ~process        
+        continue
+    end
+            
+        
+    
+    % Parse name of stack used for alignment
+    switch tomolist(i).alignment_stack
+        case 'unfiltered'
+            process_stack = tomolist(i).stack_name;
+        case 'dose-filtered'
+            process_stack = tomolist(i).dose_filtered_stack_name;
+        otherwise
+            error([p.name,'ACTHUNG!!! Unsuppored stack!!! Only "unfiltered" and "dose-filtered" supported!!!']);
+    end        
+    [~,stack_name,~] = fileparts(process_stack);
+    
+    disp(['Generating motivelist for ',stack_name,'...']);
+    
+    
+    % Parse center files
+    try
+        cen_idx = find(endsWith(tomolist(i).metadata.(metadata_type),'.em'));
+    catch
+        warning(['ACHTUNG!!! ',stack_name,' contains no .em files!!! Skipping to next tomogram...']);
+        continue
+    end
+    n_cen_files = numel(cen_idx);
+    
+    % Read in center files
+    cen_cell = cell(n_cen_files,1);
+    t = 1;  % Tube index counter
+    for j = 1:n_cen_files
+        
+        % Read in center file
+        cen_name = [tomolist(i).stack_dir,'metadata/',metadata_type,'/',tomolist(i).metadata.(metadata_type){cen_idx(j)}];
+        cen_cell{j} = sg_emread(cen_name);
+        
+        % Parse tube indices
+        tube_id = unique(cen_cell{j}(2,:));
+        
+        % Update indices within tomogram
+        for k = 1:numel(tube_id)
+            temp_idx = cen_cell{j}(2,:) == tube_id(k);
+            cen_cell{j}(2,temp_idx) = t;
+            t = t+1;
+        end
+        
+    end
+    
+    % Concatenate centers
+    cens = [cen_cell{:}];
+    n_tubes = t-1;
+    
+    
+    
+
+    % Initialize temporary motl for tomo
+    tube_cell = cell(n_tubes,1);
+    
+    % Initialize temporary array for radii
+    tube_rad = zeros(n_tubes,3);
+    tube_rad(:,1) = tomolist(i).tomo_num;
+    
+    for j = 1:n_tubes
+    
+        % Parse tube motivelist
+        tube_idx = cens(2,:) == j;
+        tube_cens = cens(:,tube_idx);                
+        
+        % Parse and store radius
+        tube_rad(j,2) = j;
+        tube_rad(j,3) = tube_cens(3,1);    
+        
+        % Generate surface positions        
+        temp_motl = sg_motl_generate_tube_function(cens(8:10,tube_idx),l_dist,c_dist,tube_rad(j,3),helical_step);
+        n_temp_motl = numel(temp_motl.motl_idx);
+        
+        % Fill subtomo_num
+        temp_motl.subtomo_num = int32(subtomo_num:(subtomo_num + n_temp_motl-1))';
+        % Increment counter
+        subtomo_num = subtomo_num + n_temp_motl;
+        % Fill object number
+        temp_motl.object = ones(size(temp_motl.object),'int32').*j;
+        % Store motl
+        tube_cell{j} = temp_motl;
+        
+%         %%% DEBUG
+%         debug_em = zeros(20,n_pos);
+%         debug_em(4,:) = 1:n_pos;
+%         debug_em(8:10,:) = cat(1,temp_motl.orig_x',temp_motl.orig_y',temp_motl.orig_z');
+%         debug_em(11:13,:) = cat(1,temp_motl.x_shift',temp_motl.y_shift',temp_motl.z_shift');
+%         debug_em(17:19,:) = cat(1,temp_motl.phi',temp_motl.psi',temp_motl.the');
+%         sg_emwrite('debug.em',debug_em);
+        
+
+        
+    end
+    
+    % Concatenate and fill other fields
+    tomo_cell_idx(i) = true;
+    tomo_cell{i} = sg_motl_concatenate(false,tube_cell);
+    tomo_cell{i}.tomo_num = ones(size(tomo_cell{i}.tomo_num),'int32').*tomolist(i).tomo_num;
+    
+    % Store radii
+    rad_cell{i} = tube_rad;
+
+    % Threshold list
+    dims = tm_parse_tomogram_dimensions(tomolist(i),binning);
+    tomo_cell{i} = sg_motl_check_tomo_edges(dims,tomo_cell{i},padding);
+    
+%     % Concatenate and store tomo motl
+%     tomo_cell{i} = sg_motl_concatenate(false,tomo_motl);
+%     
+%     % Threshold list
+%     tomo_name = [tomo_dir,'/',num2str(tomo_num(i),fmt),'.mrc'];
+%     tomo_cell{i} = sg_motl_check_tomo_edges(tomo_name,tomo_cell{i},padding);
+        
+        
+end
+
+%% Generate full motivelist
+
+% Remove empty cells
+tomo_cell = tomo_cell(tomo_cell_idx);
+rad_cell = rad_cell(tomo_cell_idx);
+
+% Concatenate all tomos
+allmotl = sg_motl_concatenate(false,tomo_cell);
+n_motls = numel(allmotl.motl_idx);
+
+% Fill remaining fields
+allmotl.motl_idx = int32(1:n_motls)';
+allmotl.subtomo_num = int32(1:n_motls)';
+allmotl.class = ones(n_motls,1,'int32');
+
+% Write motl
+disp([num2str(n_motls),' motivelist entries generated...']);
+sg_motl_write2(motl_name,allmotl);
+        
+% Write radii list
+radii = vertcat(rad_cell{:});  % Concatenate radii
+dlmwrite(radlist_name,radii);
 
 
 

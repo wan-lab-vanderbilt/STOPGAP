@@ -9,7 +9,7 @@ function complete_pca_covariance_matrix(p,o,s,idx,paramfilename)
 
 % Wait for compiling to finish
 wait_for_them([p(idx).rootdir,'/',o.commdir],'sg_pca_covarmat',o.n_filt,s.wait_time);
-disp([s.nn,'STOPGAP PCA covariance-matrix calculation complete... Compiling timings...']);
+disp([s.cn,'STOPGAP PCA covariance-matrix calculation complete... Compiling timings...']);
 
 % Compile time
 compile_pca_timings(paramfilename,p,o,idx,'p_covar');
@@ -27,5 +27,5 @@ system(['rm -f ',p(idx).rootdir,'/',o.tempdir,'/timer_f_covar*']);
 
 % Write completion file
 system(['touch ',p(idx).rootdir,'/',o.commdir,'/complete_sg_pca_covar']);
-disp([s.nn,'PCA covariance-matrix calculation complete!!!']);
+disp([s.cn,'PCA covariance-matrix calculation complete!!!']);
 

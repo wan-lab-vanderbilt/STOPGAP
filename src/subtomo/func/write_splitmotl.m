@@ -1,4 +1,4 @@
-function sm = write_splitmotl(p,o,idx,sm,task,ali)
+function sm = write_splitmotl(p,o,idx,sm,task,motl,ali)
 %% write_splitmotl
 % A function for initializing and writing of split motivelist during
 % parallel subtomogram alignment.
@@ -11,16 +11,16 @@ switch task
     
     case 'init'
         
-        %%%%% Initialize motivelist %%%%%
-        
-        % Determine indices
-        motl_idx = ismember(o.allmotl.motl_idx,o.ali_motl);
-
-        % Parse new motivelist
-        sm.motl = parse_motl(o.allmotl,motl_idx);
-        
-        % Writing index
-        sm.idx = 1;
+%         %%%%% Initialize motivelist %%%%%
+%         
+%         % Determine indices
+%         motl_idx = ismember(o.allmotl.motl_idx,o.ali_motl);
+% 
+%         % Parse new motivelist
+%         sm.motl = parse_motl(o.allmotl,motl_idx);
+%         
+%         % Writing index
+%         sm.idx = 1;
         
         
         
@@ -35,13 +35,13 @@ switch task
         for i = 1:sm.n_fields
             switch(sm.motl_fields{i,3})
                 case 'str'
-                    ml = max(cellfun(@(x) numel(x), sm.motl.(sm.motl_fields{i,1})));
+                    ml = max(cellfun(@(x) numel(x), o.allmotl.(sm.motl_fields{i,1})));
                     sm.fmt_cell{i} = ['%-',num2str(ml),'c'];
                 case 'int'
-                    md = ceil(log10(single(max(abs(sm.motl.(sm.motl_fields{i,1})))+1)));
+                    md = ceil(log10(single(max(abs(o.allmotl.(sm.motl_fields{i,1})))+1)));
                     sm.fmt_cell{i} = ['%',num2str(md),'d'];
                 case 'float'
-                    md = ceil(log10(max(abs(sm.motl.(sm.motl_fields{i,1})))+1));
+                    md = ceil(log10(max(abs(o.allmotl.(sm.motl_fields{i,1})))+1));
                     sm.fmt_cell{i} = ['%',num2str(md+6),'.4f'];
                 case 'boo'
                     sm.fmt_cell{i} = '%1d';
@@ -73,14 +73,14 @@ switch task
             [~,max_idx] = max([ali(:,i).score]);
 
             % Fill fields
-            sm.motl.x_shift(sm.idx) = ali(max_idx,i).new_shift(1);
-            sm.motl.y_shift(sm.idx) = ali(max_idx,i).new_shift(2);
-            sm.motl.z_shift(sm.idx) = ali(max_idx,i).new_shift(3);
-            sm.motl.phi(sm.idx) = ali(max_idx,i).phi;
-            sm.motl.psi(sm.idx) = ali(max_idx,i).psi;
-            sm.motl.the(sm.idx) = ali(max_idx,i).the;
-            sm.motl.score(sm.idx) = ali(max_idx,i).score;
-            sm.motl.class(sm.idx) = ali(max_idx,i).class;
+            motl.x_shift = ali(max_idx,i).new_shift(1);
+            motl.y_shift = ali(max_idx,i).new_shift(2);
+            motl.z_shift = ali(max_idx,i).new_shift(3);
+            motl.phi = ali(max_idx,i).phi;
+            motl.psi = ali(max_idx,i).psi;
+            motl.the = ali(max_idx,i).the;
+            motl.score = ali(max_idx,i).score;
+            motl.class = ali(max_idx,i).class;
             
             
             
@@ -102,9 +102,9 @@ switch task
                 % Parse data
                 switch sm.motl_fields{j,3}
                     case 'str'
-                        val = sm.motl.(sm.motl_fields{j,1}){sm.idx};
+                        val = motl.(sm.motl_fields{j,1}){1};
                     otherwise
-                        val = sm.motl.(sm.motl_fields{j,1})(sm.idx);
+                        val = motl.(sm.motl_fields{j,1});
                 end
 
                 % Print data
@@ -112,8 +112,8 @@ switch task
 
             end
             
-            % Increment counter
-            sm.idx = sm.idx + 1;
+%             % Increment counter
+%             sm.idx = sm.idx + 1;
 
         end
         

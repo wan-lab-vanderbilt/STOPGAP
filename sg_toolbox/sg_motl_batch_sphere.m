@@ -1,59 +1,120 @@
+function sg_motl_batch_sphere(tomolist_name,output_name,metadata_type,binning,p_dist,rand_phi,padding,subset_list)
 %% sg_motl_batch_sphere
-% A function to batch generate motivelists for a set of spheres. 
+% A function to batch generate motivelists for a set of spheres. Input data
+% is parsed from a TOMOMAN tomolist and metadata type.
 %
-% The input folder should contain a subfolder for each tomogram; each
-% folder should be named after the tomogram number. Within each folder
-% there should be a single .em file containing sphere centers and radii, as
-% defined by Kun Qu's "pick particle" Chimera plugin. 
+% The metadata subfolder should contain .em files containg sphere centers
+% and radii, as defined by Kun Qu's "pick particle" Chimera plugin. 
+%
+% "binning" is the binning of the input files
+%
+% "p_dist" is the inter-particle distance on the sphere surface.
+%
+% "rand_phi" randomizes the in-plane phi angles.
+%
+% "padding" removes positions that are within a certain number of voxels
+% from the tomogram edges.
+%
+% "subset_list" is the name of an input plain-text file for a list of
+% tomograms to work on. The list should contain the tomo_num of the
+% tomograms to use.
 % 
-% Points can also be thresholded with respect to tomogram boundaries.
 %
-% WW 07-2018
+% WW 08-2022
 
-%% Inputs
+% % % % % DEBUG
+% tomolist_name = '/hd1/wwan/2022_embo-course/hiv_subset/tomo/tomolist.mat';
+% output_name = 'allmotl_1.star';
+% metadata_type = 'sphere';
+% binning = 8;
+% p_dist = 3.5;
+% rand_phi = true;
+% padding = 16;
+% subset_list = 'subset_list.txt';
 
-% Input folder
-input_folder = '/fs/gpfs03/lv03/pool/pool-plitzko/will_wan/hempelmann/subtomo/startset/';
+%% Check check
 
-% Center file name
-cen_filename = 'single_vesicle.em';
+% Check for subset list
+if nargin < 8
+    subset = [];
+elseif isempty(subset_list)
+    subset = [];
+else
+    % Read subset list
+    subset = dlmread(subset_list);
+end
 
-% Distance between points
-p_dist = 3;
-
-% Randomize phi
-rand_phi = 1;   % Randomize phi angles (1 = yes, 0 = no)
-
-% Tomogram dir
-tomo_dir = '/fs/gpfs03/lv03/pool/pool-plitzko/will_wan/hempelmann/tomos/bin8/';
-digits = 1;
-padding = 12;    % Size of the edge boundary for thresholding; any centers within the boundary are removed.
-
-% Output name
-output_name = 'allmotl_1.star';
 
 %% Initalize
 
-% Find directores
-all_dir = dir(input_folder);
-dir_idx = [all_dir.isdir] & ~strcmp({all_dir.name},'.')& ~strcmp({all_dir.name},'..');
-d_names = {all_dir(dir_idx).name};
-n_tomos = numel(d_names);
-
-% Parse numeric format for tomogram names
-nfmt = ['%0',num2str(digits),'i'];
+% Read tomolist
+tomolist = tm_read_tomolist([],tomolist_name);
+n_tomos = numel(tomolist);
 
 % Cell to hold motl from each tomogram
 tomo_cell = cell(n_tomos,1);
+tomo_cell_idx = false(n_tomos,1);
+
 
 %% Generate spheres for each tomogram
+% Subtomogram number counter
+subtomo_num = 1;
 
 % Loop through tomograms
 for i = 1:n_tomos
     
-    % Read in center file
-    cens = sg_emread([input_folder,'/',d_names{i},'/',cen_filename]);
+    % Check processing
+    process = true;
+    if tomolist(i).skip
+        process = false;        
+    end
+    if ~isempty(subset)
+        if ~any(tomolist(i).tomo_num == subset)
+            process = false;
+        end
+    end
+    if ~process        
+        continue
+    end
+            
+        
+    
+    % Parse name of stack used for alignment
+    switch tomolist(i).alignment_stack
+        case 'unfiltered'
+            process_stack = tomolist(i).stack_name;
+        case 'dose-filtered'
+            process_stack = tomolist(i).dose_filtered_stack_name;
+        otherwise
+            error([p.name,'ACTHUNG!!! Unsuppored stack!!! Only "unfiltered" and "dose-filtered" supported!!!']);
+    end        
+    [~,stack_name,~] = fileparts(process_stack);
+    
+    disp(['Generating motivelist for ',stack_name,'...']);
+    
+    
+    
+    
+    % Parse center files
+    try
+        cen_idx = find(endsWith(tomolist(i).metadata.(metadata_type),'.em'));
+    catch
+        warning(['ACHTUNG!!! ',stack_name,' contains no .em files!!! Skipping to next tomogram...']);
+        continue
+    end
+    n_cen_files = numel(cen_idx);
+    
+    % Read in center files
+    cen_cell = cell(n_cen_files,1);
+    for j = 1:n_cen_files
+        cen_name = [tomolist(i).stack_dir,'metadata/',metadata_type,'/',tomolist(i).metadata.(metadata_type){cen_idx(j)}];
+        cen_cell{j} = sg_emread(cen_name);
+    end
+    
+    % Concatenate centers
+    cens = [cen_cell{:}];
     n_spheres = size(cens,2);
+    
     
     % Initialize motl cell for tomogram
     sphere_cell = cell(n_spheres,1);
@@ -62,36 +123,44 @@ for i = 1:n_tomos
     for j = 1:n_spheres
         % Calculate sphere
         temp_motl = sg_motl_sphere_function(cens(8:10,j), cens(3,j), p_dist,rand_phi);
+        n_temp_motl = numel(temp_motl.motl_idx);
+        % Fill subtomo_num
+        temp_motl.subtomo_num = int32(subtomo_num:(subtomo_num + n_temp_motl-1))';
+        % Increment counter
+        subtomo_num = subtomo_num + n_temp_motl;
         % Fill object number
-        temp_motl = sg_motl_fill_field(temp_motl,'object',j);
+        temp_motl.object = ones(size(temp_motl.object),'int32').*j;
         % Store motl
         sphere_cell{j} = temp_motl;
     end
     
     % Concatenate and fill other fields
-    tomo_cell{i} = cat(1,sphere_cell{:});
-    tomo_cell{i} = sg_motl_fill_field(tomo_cell{i},'tomo_num',str2double(d_names{i}));
+    tomo_cell_idx(i) = true;
+    tomo_cell{i} = sg_motl_concatenate(false,sphere_cell);
+    tomo_cell{i}.tomo_num = ones(size(tomo_cell{i}.tomo_num),'int32').*tomolist(i).tomo_num;
     
     % Threshold list
-    tomo_name = [tomo_dir,'/',num2str(str2double(d_names{i}),nfmt),'.rec'];
-    tomo_cell{i} = sg_motl_check_tomo_edges(tomo_name,tomo_cell{i},padding);
+    dims = tm_parse_tomogram_dimensions(tomolist(i),binning);
+    tomo_cell{i} = sg_motl_check_tomo_edges(dims,tomo_cell{i},padding);
     
 end
 
+% Remove empty cells
+tomo_cell = tomo_cell(tomo_cell_idx);
+
 % Concatenate motl
-allmotl = cat(1,tomo_cell{:});
-n_motls = numel(allmotl);
+allmotl = sg_motl_concatenate(false,tomo_cell);
+n_motls = numel(allmotl.motl_idx);
 
 % Fill remaining fields
-allmotl = sg_motl_fill_field(allmotl,'subtomo_num',1:n_motls);
-allmotl = sg_motl_fill_field(allmotl,'halfset','A');
-allmotl = sg_motl_fill_field(allmotl,'score',0);
-allmotl = sg_motl_fill_field(allmotl,'class',1);
+allmotl.motl_idx = int32(1:n_motls)';
+allmotl.subtomo_num = int32(1:n_motls)';
+allmotl.class = ones(n_motls,1,'int32');
 
 
 % Write motl
 disp([num2str(n_motls),' motivelist entries generated...']);
-sg_motl_write(output_name,allmotl);
+sg_motl_write2(output_name,allmotl);
 
 
 

@@ -5,7 +5,7 @@ function pca_calculate_eigenvectors_parallel(p,o,s,idx)
 % WW 06-2019
 
 %% Initialize
-disp([s.nn,'Calculating eigenvectors in parallel...']);
+disp([s.cn,'Calculating eigenvectors in parallel...']);
 
 % Generate bandpass filters
 f = generate_pca_bpf(o,s);
@@ -94,7 +94,7 @@ for i = p_start:p_end
     % Increment completion counter
     [pc,rt_str] = progress_counter(pc,'count',n_p_subtomo,s.counter_pct);
     if ~isempty(rt_str)
-        disp([s.nn,'Job progress: ',num2str(pc.c),' out of ',num2str(n_p_subtomo),' volumes processed... ',rt_str]);
+        disp([s.cn,'Job progress: ',num2str(pc.c),' out of ',num2str(n_p_subtomo),' volumes processed... ',rt_str]);
     end
     
 end
@@ -124,7 +124,7 @@ end
 
 % Write checkjob
 system(['touch ',p(idx).rootdir,'/',o.commdir,'/sg_pca_p_eigenvec_',num2str(o.procnum)]);
-disp([s.nn,'Parallel eigenvector calculation complete!!!']);
+disp([s.cn,'Parallel eigenvector calculation complete!!!']);
 
 
 

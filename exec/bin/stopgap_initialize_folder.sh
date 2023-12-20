@@ -29,9 +29,11 @@ elif [[ ${task} == 'tm' ]]; then
 elif [[ ${task} == 'pca' ]]; then
     echo "Initializing PCA folder..."
     mkdir -p params temp comm raw ref masks lists subtomograms rvol pca meta
+
 elif [[ ${task} == 'vmap' ]]; then
     echo "Initializing variance map folder..."
     mkdir -p params temp comm raw ref masks lists subtomograms meta
+
 else
     echo "ACHTUNG!!! Unsupported task!!!"
     exit 1

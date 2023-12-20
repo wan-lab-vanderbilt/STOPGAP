@@ -8,11 +8,15 @@ function o = check_supersampling(p,o,s,idx)
 
 % Check for param existence
 if sg_check_param(p(idx),'avg_ss')
-    disp([s.nn,'Performing averaging with super-sampling!!!']);
-    o.avg_ss = 2;
+    disp([s.cn,'Performing averaging with super-sampling!!!']);
+    o.avg_ss = p(idx).avg_ss;
 else
     o.avg_ss = 1;
 end
+
+% Round supersampling factors to ensure even integer boxsize
+ss_boxsize = round_to_even(o.boxsize.*o.avg_ss);
+o.avg_ss = ss_boxsize(1)./o.boxsize(1);
 
 % Write supersampled sizes
 o.ss_boxsize = o.boxsize*o.avg_ss;

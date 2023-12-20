@@ -19,13 +19,17 @@ switch mode
         % Pre-calculate grid
         v.grid = calculate_grid(o.boxsize,'ali');
 
+        % Calcualte crop ratio
+        if o.fcrop
+            o.crop_ratio = o.boxsize./o.full_boxsize;
+        end
         
         
     case 'prep'
         
                 
-        % Non-zero Fourier indices
-        v.f_idx = (o.bpf.*f.bin_wedge)>0;
+%         % Non-zero Fourier indices
+%         v.f_idx = (o.bpf.*f.bin_wedge)>0;
         
         % Transform subtomo
         v.subtomo = fftn(v.subtomo);
@@ -37,10 +41,10 @@ switch mode
         v.subtomo = v.subtomo.*f.pfilt.*o.bpf;
         
 
-        % Store gridpoints
-        v.x = v.grid.x(v.f_idx);
-        v.y = v.grid.y(v.f_idx);
-        v.z = v.grid.z(v.f_idx);        
+%         % Store gridpoints
+%         v.x = v.grid.x(v.f_idx);
+%         v.y = v.grid.y(v.f_idx);
+%         v.z = v.grid.z(v.f_idx);        
         
         
     case 'score'
@@ -85,29 +89,34 @@ switch mode
                 mask = sg_rotate_vol(mask,[ali(i,j).phi,ali(i,j).psi,ali(i,j).the],[],o.rot_mode);
 
                 % Apply filters
-%                 ref = real(ifftn(fftn(ref).*f.rfilt.*o.bpf)); 
-                ref = (fftn(ref).*f.rfilt.*o.bpf); 
-                if o.fcrop
-                    ref = uncrop_fftshifted_vol(ref,o.f_idx);
-                    mask = fourier_uncrop_volume(mask,o.f_idx);
-                end
-                ref = real(ifftn(ref));
+                ref = real(ifftn(fftn(ref).*f.rfilt.*o.bpf)); 
+%                 ref = (fftn(ref).*f.rfilt.*o.bpf); 
+%                 if o.fcrop
+%                     ref = uncrop_fftshifted_vol(ref,o.f_idx);
+%                     mask = fourier_uncrop_volume(mask,o.f_idx);
+%                 end
+%                 ref = real(ifftn(ref));
                                 
-        
-                % Get mask info
-                m_idx = mask > 0;
-                m_val = mask(m_idx);
-                clear mask
-
-                % Apply mask to reference data
-                ref = ref(m_idx).*m_val;
-                ref = (ref - mean(ref))./std(ref);  % Normalize
+                % Normalize under mask
+                ref = normalize_under_mask(ref,mask);
+                
+%                 % Get mask info
+%                 m_idx = mask > 0;
+%                 m_val = mask(m_idx);
+%                 clear mask
+% 
+%                 % Apply mask to reference data
+%                 ref = ref(m_idx).*m_val;
+%                 ref = (ref - mean(ref))./std(ref);  % Normalize
         
         
                 %%%%% Score %%%%%
                 
                 % Parse old shift
-                old_shift = -ali(i,j).old_shift;
+                old_shift = double(-ali(i,j).old_shift);
+                if o.fcrop
+                    old_shift = old_shift.*o.crop_ratio;
+                end
 %                 if o.fcrop
 %                     old_shift = -(ali(i,j).old_shift.*(o.boxsize./o.full_boxsize));
 %                 else
@@ -115,17 +124,17 @@ switch mode
 %                 end
         
                 % Minimze phase residual
-                pearson_fun = @(shift) calculate_pearson_align(o,v,ref,m_idx,m_val,shift);                  
+                pearson_fun = @(shift) calculate_pearson_align(o,v,ref,mask,shift)   ;                  
                 [shift,dcc] = fminsearch(pearson_fun,old_shift);
         
                 % Rescale new shifts
-%                 if o.fcrop
-%                     shift = shift.*(o.full_boxsize./o.boxsize);
-%                 end
+                if o.fcrop
+                    shift = shift./o.crop_ratio;
+                end
 
                 % Store parameters
-                ali(i,j).score = 1-dcc;
-                ali(i,j).new_shift = -shift;
+                ali(i,j).score = single(1-dcc);
+                ali(i,j).new_shift = single(-shift);
 
                 
                 % Check stochastic search exit condition
@@ -164,7 +173,7 @@ switch mode
         
         
     otherwise
-        error([s.nn,'ACHTUNG!!! Invalid mode!!!']);
+        error([s.cn,'ACHTUNG!!! Invalid mode!!!']);
 
         
 end

@@ -14,14 +14,14 @@ function vmap_watcher(rootdir,paramfilename,n_cores, submit_cmd)
 
 % Intialize settings struct
 s = struct();
-s.nn = 'Watcher: ';
+s.cn = 'Watcher: ';
 
 
 % Check input arguments
 if nargin == 3
     submit_cmd = [];
 elseif (nargin < 3) || (nargin > 4)
-    error([s.nn,'ACHTUNG!!! Incorrect number of inputs!!!']);
+    error([s.cn,'ACHTUNG!!! Incorrect number of inputs!!!']);
 end
 
 %% Initialize
@@ -46,7 +46,7 @@ disp('System dependencies checked!!!');
 % Read parameter file
 [p,idx] = update_vmap_param(s,rootdir, paramfilename);
 if isempty(idx)
-    error([s.nn,'ACHTUNG!!! All jobs in param file are finished!!!']);
+    error([s.cn,'ACHTUNG!!! All jobs in param file are finished!!!']);
 end
 
 % Read in settings
@@ -70,11 +70,11 @@ if ~isempty(submit_cmd)
     system(['rm -f ',p(idx).rootdir,'/',o.commdir,'/*']);
     
     
-    disp([s.nn,'Submitting job...']);
+    disp([s.cn,'Submitting job...']);
     system(submit_cmd);
 else
     
-    disp([s.nn,'No submission command given... Watching pre-submitted job...']);
+    disp([s.cn,'No submission command given... Watching pre-submitted job...']);
     
 end
 
@@ -121,11 +121,11 @@ while run
         
         % Wait until parallel averaging completion
         watch_for_files(p,o,s,idx,'sg_p_vmap',o.n_cores,' parallel variance maps calculated...');
-        fprintf('\n%s\n',[s.nn,'Parallel maps written!!! Waiting for completion of parallel step...']);
+        fprintf('\n%s\n',[s.cn,'Parallel maps written!!! Waiting for completion of parallel step...']);
         
         % Wait for it
         wait_for_it([p(idx).rootdir,'/',o.commdir],'complete_stopgap_p_vmap',s.wait_time);
-        fprintf('%s\n\n',[s.nn,'Parallel variance calculations complete!!!']);        
+        fprintf('%s\n\n',[s.cn,'Parallel variance calculations complete!!!']);        
                         
     end
 
@@ -136,12 +136,12 @@ while run
     % Final averaging
     if ~p(idx).completed_f_vmap
 
-        disp([s.nn,'Averaging final variance maps...']);
+        disp([s.cn,'Averaging final variance maps...']);
         
         
         % Wait until final averaging completion
         watch_for_files(p,o,s,idx,'sg_f_vmap',n_classes,' final maps written...');
-        fprintf('\n%s\n',[s.nn,'All variance maps written!!! Cleaning up iteration...']);
+        fprintf('\n%s\n',[s.cn,'All variance maps written!!! Cleaning up iteration...']);
         
         % Wait for it
         wait_for_it([p(idx).rootdir,'/',o.commdir],'complete_stopgap_f_vmap',s.wait_time);
@@ -156,7 +156,7 @@ while run
         
     % Check for end of run and refresh parameters if necessary
     if isempty(idx)
-        disp([s.nn,'End of param file reached... ']);
+        disp([s.cn,'End of param file reached... ']);
         % End of param file reached; time to die
         run = false;
     end

@@ -24,12 +24,12 @@ function [o,v,ali] = score_subtomo_alignment(p,o,s,idx,v,score_mode,f,ali)
 if nargin == 7
     ali = struct();
 elseif nargin ~= 8
-    error([s.nn,'ACHTUNG!!! Invalid number of inputs for score_subtomo_match!!!']);
+    error([s.cn,'ACHTUNG!!! Invalid number of inputs for score_subtomo_match!!!']);
 end
 
 % Check mode
-if ~any(strcmp(score_mode,{'init','prep','score'}));
-    error([s.nn,'ACHTUNG!!! Invalid mode for score_subtomo_match!!!']);
+if ~any(strcmp(score_mode,{'init','prep','score'}))
+    error([s.cn,'ACHTUNG!!! Invalid mode for score_subtomo_match!!!']);
 end
 
 % Parse scoring function

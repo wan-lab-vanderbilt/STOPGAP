@@ -16,10 +16,13 @@ n_dir = numel(d_fields);
 for i = 1:n_dir
     
     if sg_check_param(p(idx),d_fields{i})
-        o.(d_fields{i}) = p(idx).(d_fields{i});
+        dir_name = p(idx).(d_fields{i});
     else
-        o.(d_fields{i}) = s.(d_fields{i});
+        dir_name = s.(d_fields{i});
     end
+   
+    % Check name
+    o.(d_fields{i}) = sg_check_dir_slash(dir_name);
     
 end
 

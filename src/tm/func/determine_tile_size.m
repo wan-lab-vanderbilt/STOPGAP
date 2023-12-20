@@ -2,7 +2,9 @@ function o = determine_tile_size(p,o,s,idx)
 %% determine_tile_size
 % Determine the tile size required to split a tomogram into even pieces.
 %
-% WW 03-2019
+% Bugfix by M. Obr
+%
+% WW 04-2023
 
 
 %% Parse tomogram size
@@ -34,14 +36,22 @@ grid = prod(reshape(f,3,[]),2);
 % sort_patchsize = ceil(sort_tomo_size(:,2)./sort(grid));
 % patchsize = sort_patchsize(sort_tomo_size(sort_idx,1))';
 
-% Generate average box dimensions
+% % Generate average box dimensions
+% sort_grid = sort(grid);
+% [sort_tomo_size,sort_idx] = sortrows(cat(1,1:3,tomo_size)',2);
+% sort_patchsize = ceil(sort_tomo_size(:,2)./sort_grid-1);
+% patchsize = sort_patchsize(sort_tomo_size(sort_idx,1))';
+
+% Generate average box dimensions % M Obr edit
 sort_grid = sort(grid);
-[sort_tomo_size,sort_idx] = sortrows(cat(1,1:3,tomo_size)',2);
+sort_tomo_size = sortrows(cat(1,1:3,tomo_size)',2);
+[~,sort_idx]=sort(sort_tomo_size(:,1));
 sort_patchsize = ceil(sort_tomo_size(:,2)./sort_grid-1);
-patchsize = sort_patchsize(sort_tomo_size(sort_idx,1))';
+patchsize = sort_patchsize(sort_idx)';
 
 % Store grid parameters
-o.grid = sort_grid(sort_tomo_size(sort_idx,1));
+% o.grid = sort_grid(sort_tomo_size(sort_idx,1));
+o.grid = sort_grid(sort_idx);
 
 
 % Round down patchsize to even

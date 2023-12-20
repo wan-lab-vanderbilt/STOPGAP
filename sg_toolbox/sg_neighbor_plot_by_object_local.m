@@ -6,14 +6,14 @@
 
 
 % Input motl
-motl_name = 'allmotl_B_dclean2_7.star';
+motl_name = 'tubemotl_16_12.star';
 
 % Output root name
 output_root = 'nplot';
 
 % Plot parameters
-boxsize = 128;
-scaling = 4;
+boxsize = 256;
+scaling = 8;
 
 
 

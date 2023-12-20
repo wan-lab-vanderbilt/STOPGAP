@@ -10,16 +10,16 @@
 %% Inputs
 
 % Tomogram Parameters
-t.tomo_num     = 1;      % Tomogram number
-t.pixelsize    = 4.21;   % Full pixelsize
-t.tomo_x       = 3712;   % Full tomogram X-dimension
-t.tomo_y       = 3712;   % Full tomogram Y-dimension
-t.tomo_z       = 1856;   % Full tomogram Z-dimension
+t.tomo_num     = 51;      % Tomogram number
+t.pixelsize    = 2.776;   % Full pixelsize
+t.tomo_x       = 4092;   % Full tomogram X-dimension
+t.tomo_y       = 5760;   % Full tomogram Y-dimension
+t.tomo_z       = 1188;   % Full tomogram Z-dimension
 t.z_shift      = 0;      % Z-shift during tomogram reconstruction
 
 % Tilt-series parameters
-min_tilt     = -50;         % Minimum tilt angle
-max_tilt     = 68;          % Maximum tilt angle
+min_tilt     = -70;         % Minimum tilt angle
+max_tilt     = 50;          % Maximum tilt angle
 tilt_step    = 2;           % Tilt step
 tilt_scheme  = 'hagen';     % Supported are 'unidirectional', 'bidirectional', and 'hagen'.
 bi_start = 10;               % Starting tilt for bidirectional scheme. Ignore otherwise.
@@ -37,7 +37,7 @@ m.cs = 2.7;                 % Spherical abberation (mm)
 
 
 % Output name
-wedgelistname = 'wedgelist.star';
+wedgelistname = 'wedgelist_47.star';
 
 
 %% Generate dose list

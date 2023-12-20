@@ -7,7 +7,7 @@ function o = refresh_motl(p,o,s,idx)
 
 
 %% Check for refresh
-disp([s.nn,'Refreshing motivelist...']);
+disp([s.cn,'Refreshing motivelist...']);
 
 % Check iteration
 iteration = p(idx).iteration;
@@ -59,18 +59,26 @@ end
 %%  Read motive list
 
 if refresh
+     
+    % Check for local copy
+    if o.copy_local
+        copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/','motivelist_copied',s.wait_time,o.motl_name,false);
+    end
     
     % Read motive list
-    o.allmotl = sg_motl_read2([p(idx).rootdir,o.motl_name]);    
+    o.allmotl = sg_motl_read2([o.rootdir,o.motl_name]);    
     
+    % Resort 
+    o.allmotl = sg_sort_motl2(o.allmotl);
     
-    % Resort
-    sorting_array = cat(2,o.allmotl.tomo_num,o.allmotl.subtomo_num,o.allmotl.class);
-    [~,sort_idx] = sortrows(sorting_array,[1,2,3]);
-    fields = fieldnames(o.allmotl);
-    for i = 1:numel(fields)
-        o.allmotl.(fields{i}) = o.allmotl.(fields{i})(sort_idx);
-    end
+%     % Old resorting scheme
+%     % Resort
+%     sorting_array = cat(2,o.allmotl.tomo_num,o.allmotl.subtomo_num,o.allmotl.class);
+%     [~,sort_idx] = sortrows(sorting_array,[1,2,3]);
+%     fields = fieldnames(o.allmotl);
+%     for i = 1:numel(fields)
+%         o.allmotl.(fields{i}) = o.allmotl.(fields{i})(sort_idx);
+%     end
     
     
     % Find unqiue entries

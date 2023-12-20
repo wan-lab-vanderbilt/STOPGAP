@@ -84,7 +84,7 @@ for c = 1:o.n_classes
                 try
                     subtomo = read_vol(s,p(idx).rootdir,subtomo_name);
                 catch
-                    error([s.nn,'ACHTUNG!!! Error reading file ',subtomo_name,'!!!']);
+                    error([s.cn,'ACHTUNG!!! Error reading file ',subtomo_name,'!!!']);
                 end
 
                 
@@ -143,13 +143,13 @@ for c = 1:o.n_classes
         % Increment completion counter
         [pc,rt_str] = progress_counter(pc,'count',n_part,s.counter_pct);
         if ~isempty(rt_str)
-            disp([s.nn,'Job progress: ',num2str(pc.c),' out of ',num2str(n_part),[' averaged for class ',num2str(class),'... '],rt_str]);
+            disp([s.cn,'Job progress: ',num2str(pc.c),' out of ',num2str(n_part),[' averaged for class ',num2str(class),'... '],rt_str]);
         end
 
     end
     
     % Write out volumes
-    disp([s.nn,'Averaging of class ',num2str(o.classes(c)),' complete!!! Writing outputs...']);       
+    disp([s.cn,'Averaging of class ',num2str(o.classes(c)),' complete!!! Writing outputs...']);       
           
         % Output names
         switch p(idx).vmap_mode

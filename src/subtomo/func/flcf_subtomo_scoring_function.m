@@ -155,6 +155,6 @@ switch score_mode
         
            
     otherwise
-        error([s.nn,'ACHTUNG!!! Invalid mode!!!']);        
+        error([s.cn,'ACHTUNG!!! Invalid mode!!!']);        
                 
 end

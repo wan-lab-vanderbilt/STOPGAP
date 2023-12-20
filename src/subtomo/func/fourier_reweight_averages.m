@@ -11,8 +11,8 @@ function v = fourier_reweight_averages(p,o,v,m,idx)
 % Loop through halfsets
 for i = 1:2
     
-    % Apply lowpass filter
-    wfilt = ifftshift(v.(v.wfilt_names{i})).*m.lpf;
+    % FFT shift filter
+    wfilt = ifftshift(v.(v.wfilt_names{i}));
     
     % Determine non-zero indices
     nz_idx = wfilt(:) > 0;
@@ -42,7 +42,7 @@ for i = 1:2
     wfilt(nz_idx) = 1./wfilt(nz_idx);
     
     % Reweight average
-    v.(v.ref_names{i}) = real(ifftn(fftn(v.(v.ref_names{i}).*m.cube_mask).*wfilt));
+    v.(v.ref_names{i}) = real(ifftn(fftn(v.(v.ref_names{i}).*m.cube_mask).*wfilt.*m.lpf));
     
     
     

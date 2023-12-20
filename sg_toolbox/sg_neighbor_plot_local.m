@@ -9,14 +9,14 @@
 
 
 % Input motl
-motl_name = 'allmotl_combined_3.star';!
+motl_name = 'allmotl_9.star';
 
 % Output root name
-output_root = 'vp40_nplot.mrc';
+output_root = 'nplot_9.mrc';
 
 % Plot parameters
-boxsize = 400;
-scaling = 0.2;
+boxsize = 256;
+scaling = 1;
 
 
 

@@ -1,67 +1,52 @@
-function stopgap_template_match(rootdir,param_name, procnum, n_cores)
+function stopgap_template_match(s)
 %% stopgap_template_match
-% Perform template matching with stopgap.
+% Perform template matching with STOPGAP.
 %
-% WW 05-2020
-
-% % % % % % % % DEBUG
-% rootdir = '/fs/pool/pool-plitzko/will_wan/test_sg_0.7.1/tm_test/';
-% param_name = 'params/tm_param.star';
-% procnum = '1';
-% n_cores = '480';
-
-
-%% Evaluate numeric inputs
-if (ischar(procnum)); procnum=eval(procnum); end
-if (ischar(n_cores)); n_cores=eval(n_cores); end
+% WW 04-2021
 
 
 %% Initialize
 
-% Intialize settings struct
-s = struct();
-
 % Initialize node name
-s.nn = ['Node',num2str(procnum),': '];
-
-disp([s.nn,'Initializing...']);
+disp([s.cn,'Initializing STOPGAP for template matching...']);
 
 % Read parameter file
-disp([s.nn,'Reading parameter file...']);
-[p,idx] = update_tm_param(s,rootdir, param_name);
+disp([s.cn,'Reading parameter file...']);
+[p,idx] = update_tm_param(s,s.rootdir, s.paramfilename);
 if isempty(idx)
-    error([s.nn,'ACHTUNG!!! All jobs in parameter file are completed!!!']);
+    error([s.cn,'ACHTUNG!!! All jobs in parameter file are completed!!!']);
 end
 
 % Read settings
-disp([s.nn,'Reading settings...']);
+disp([s.cn,'Reading settings...']);
 s = sg_get_tm_settings(s,p(idx).rootdir,'tm_settings.txt');
 
 
 
 % Initialize struct array to hold objects
-o = struct();
-o.procnum = procnum;
-o.n_cores = n_cores;
-
-% Parse directories
-o = sg_parse_tm_directories(p,o,s,idx);
-
-
-% Cleanup comm folder
-if o.procnum == 1
-    system(['rm -f ',p(end).rootdir,'/',o.commdir,'/*']);
-end
+o = initialize_o_struct(p,s,idx,'tm');
+% o = initialize_o_struct(s);
+% 
+% % Parse directories
+% o = sg_parse_tm_directories(p,o,s,idx);
+% 
+% 
+% % Cleanup comm folder
+% if o.procnum == 1
+%     system(['rm -f ',p(end).rootdir,'/',o.commdir,'/*']);
+% end
 
 
     
 %% Begin big loop
 run = true;
 while run        
+    disp([s.cn,'Begin template matching on index ',num2str(idx),'...']);
     
     % Initialize required variables
     o = sg_parse_tm_directories(p,o,s,idx);     % Parse iteration directories into the o struct
-    o = refresh_wedgelist(p,o,s,idx);
+    o = tm_check_copy_local(p,o,s,idx);         % Check for local copying
+    o = refresh_wedgelist(p,o,s,idx);        % Read wedgelist
     o = refresh_templates(p,o,s,idx);        % Read template and mask
     o = prepare_parallel_tm(p,o,s,idx);      % Calcalate coordinates of tiles
     
@@ -71,13 +56,14 @@ while run
     
     %%%%% Prepare for parallel template matching %%%%%    
     if ~p(idx).completed_p_tm
+        disp([s.cn,'Starting parallel template matching on index ',num2str(idx),'...']);
         
         % Initialize         
         o = generate_tm_bpf(p,o,s,idx);             % Generate bandpass filter             
         o = initialize_fourier_crop_tm(o,s);        % Iniitalize Fourier cropping
         o = initialize_phase_randomization(p,o,s,idx);  % Generate noise maps
-        disp([s.nn,'Optimizing FFT wisdom...']);
-        optimize_fft_wisdom(o.tilesize,'single');    % Optimize fft
+%         disp([s.cn,'Optimizing FFT wisdom...']);
+%         optimize_fft_wisdom(o.tilesize,'single');    % Optimize fft
 
 
 
@@ -93,12 +79,17 @@ while run
         % Write output timings
         processing_timer_tm(t,'end',p,o,idx,'parallel_tm');
 
-
+        % Check for local copying
+        if o.copy_local
+           tm_copy_local_temp_data(p,o,s,idx);
+        end
+        
+        
         % Wait for iteration to finish
         if o.procnum == 1        
             wait_for_them([p(idx).rootdir,o.commdir],['sg_ptm_',o.tomo_num],o.n_cores,s.wait_time);
             compile_timings_tm(p,o,idx,'parallel_tm');
-            [p,idx] = update_tm_param(s,rootdir, param_name, idx, 'p');
+            [p,idx] = update_tm_param(s,s.rootdir, s.paramfilename, idx, 'p');
         end
         
     end
@@ -110,11 +101,12 @@ while run
     %%%%% Final template matching %%%%%
     if o.procnum ~= 1
         % Wait for job completion
+        disp([s.cn,'Waiting for completion of template matching on index ',num2str(idx),'...']);
         wait_for_it([p(idx).rootdir,'/',o.commdir],['complete_final_tm_',o.tomo_num],s.wait_time);
         
         % Pause to wait for updated param file
         pause(s.wait_time);
-        [p,idx] = update_tm_param(s,rootdir, param_name);
+        [p,idx] = update_tm_param(s,s.rootdir, s.paramfilename);
         
         
     else
@@ -132,7 +124,7 @@ while run
         
         % Update param file
         old_idx = idx;
-        [p,idx] = update_tm_param(s,rootdir, param_name, idx, 'f');
+        [p,idx] = update_tm_param(s,s.rootdir, s.paramfilename, idx, 'f');
         
         % Remove temporary files
         system(['rm -f ',o.tempdir,'/*']);
@@ -155,6 +147,6 @@ while run
 
 end
 
-disp([s.nn,'All jobs complete!!!']);
+disp([s.cn,'All jobs complete!!!']);
 
 

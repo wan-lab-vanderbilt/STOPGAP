@@ -5,7 +5,7 @@ function v = initialize_f_avg_volumes(p,o,s,idx,mode,class,iteration)
 % WW 06-2019
 
 %% Initialize volume names
-disp([s.nn,'Initializing volumes for class: ',num2str(class)]);
+disp([s.cn,'Initializing volumes for class: ',num2str(class)]);
 
 % Initialize struct
 v = struct();

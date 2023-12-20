@@ -88,7 +88,7 @@ for i = p_start:p_end
     % Increment completion counter
     [pc,rt_str] = progress_counter(pc,'count',n_p_subtomo,s.counter_pct);
     if ~isempty(rt_str)
-        disp([s.nn,'Job progress: ',num2str(pc.c),' out of ',num2str(n_p_subtomo),' volumes processed... ',rt_str]);
+        disp([s.cn,'Job progress: ',num2str(pc.c),' out of ',num2str(n_p_subtomo),' volumes processed... ',rt_str]);
     end
     
 end

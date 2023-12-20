@@ -5,7 +5,7 @@ function declare_empty_class(p,o,s,v,idx,class)
 % WW 08-2019
 
 %% Declare empty class
-warning([s.nn,'ACHTUNG!!! Class',num2str(class),' has emptied during averaging!!!']);
+warning([s.cn,'ACHTUNG!!! Class',num2str(class),' has emptied during averaging!!!']);
 
 % Open file
 warn_name = [o.refdir,'/warning_',v.out_ref_names{3},'.txt'];

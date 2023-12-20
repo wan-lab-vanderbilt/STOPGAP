@@ -80,13 +80,13 @@ if gen_ang
     switch search_type
         
         case 'euler'
-            disp([s.nn,'Calculating Euler search angles...']);
+            disp([s.cn,'Calculating Euler search angles...']);
             
             % Calculate Euler angles
             o = calculate_arbitrary_eulers(p,o,idx);
             
         case 'cone'
-            disp([s.nn,'Calculating cone-search angles...']);
+            disp([s.cn,'Calculating cone-search angles...']);
             
             % Calculate cone angles
             o = calculate_cone_angle_list(p,o,idx);

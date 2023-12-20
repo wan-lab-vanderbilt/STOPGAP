@@ -16,13 +16,13 @@ switch mode{2}
     case 'singleref'
         
         if o.motl_type == 3
-            error([s.nn,'ACHTUNG!!! Invalid motivelist type!!! Multi-entry motivelist cannot be used in singleref run!!!']);
+            error([s.cn,'ACHTUNG!!! Invalid motivelist type!!! Multi-entry motivelist cannot be used in singleref run!!!']);
         end
         
     case 'multiclass'
         
         if o.motl_type == 3
-            error([s.nn,'ACHTUNG!!! Invalid motivelist type!!! Multi-entry motivelist cannot be used in multiclass run!!!']);
+            error([s.cn,'ACHTUNG!!! Invalid motivelist type!!! Multi-entry motivelist cannot be used in multiclass run!!!']);
         end
         
 end

@@ -64,4 +64,4 @@ ordered_fields = {'completed_ali', 'boo';
                   'temperature','num';
                   'rot_mode','str';
                   'fthresh', 'num';
-                  'avg_ss','boo';};
+                  'avg_ss','num';};

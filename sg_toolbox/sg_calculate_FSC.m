@@ -15,33 +15,33 @@
 
 
 % References
-refA_name = 'ref_sg_sp_pc21604_i100_A_1.em';
-refB_name = 'ref_sg_sp_pc21604_i100_B_1.em';
+refA_name = 'ref_cc007_dclean48_A_9_crop.mrc';
+refB_name = 'ref_cc007_dclean48_B_9_crop.mrc';
 
 % FSC mask
-mask_name = 'bin1_mask192_cr_g3.em';
+mask_name = 'cylinder.mrc';
 
 % Volume parameters
-symmetry = 'C1';      % Symmetry operator. 'C1' for no symmetry.
-pixelsize = 2.7;     % In Angstroms
+symmetry = 'C6';      % Symmetry operator. 'C1' for no symmetry.
+pixelsize = 1.35;     % In Angstroms
 
 % Output name
-ref_avg_name = 'ref_sg_sp_pc21604_i100_b600.mrc';  % Name of output filtered reference. Set to 'none' for no averaging.
+ref_avg_name = 'none';  % Name of output filtered reference. Set to 'none' for no averaging.
 flip_density = 1;
 
 % Figure-of-merit weighitng
 apply_fom = 1;     % (1 = on, 0 = off) Only disable if already applied.
 
 % B-factor sharpening
-bfactor = -600;     % Set to 0 for no sharpening.
+bfactor = -80;     % Set to 0 for no sharpening.
 fsc_thresh = 0.143; % FSC-value for lowpass filter threshold  
 edge_smooth = 3; % Smooth box edge. 0 = off, otherwise odd number must be given.
 plot_filt = 0;  % Plot sharpening filter
 
 % Plotting parameters
-plot_diagnostic = 1;        % Plot diagnostic plots the uncorrected, corrected, and mask FSC curves. Disabling plots cumulative corrected curves, allowing for direct comparison of runs.
+plot_diagnostic = 0;        % Plot diagnostic plots the uncorrected, corrected, and mask FSC curves. Disabling plots cumulative corrected curves, allowing for direct comparison of runs.
 resolution_label = 0;       % (1 = on, 0 = off)
-res_label = [32,16,8,4,2];    % X-axis label resolutions (in Angstroms). Labels beyond Nyquist are ignored.
+res_label = [32,16,8,6,4,2];    % X-axis label resolutions (in Angstroms). Labels beyond Nyquist are ignored.
 
 
 

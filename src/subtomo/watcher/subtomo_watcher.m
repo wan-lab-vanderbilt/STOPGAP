@@ -9,10 +9,10 @@ function subtomo_watcher(rootdir,paramfilename, n_cores, submit_cmd)
 
 % Intialize settings struct
 s = struct();
-s.nn = 'Watcher: ';
+s.cn = 'Watcher: ';
 
 % Check system dependencies
-disp([s.nn,'Checking system dependencies...']);
+disp([s.cn,'Checking system dependencies...']);
 dependencies = {'rsync','cat','wc'};
 
 for i = 1:numel(dependencies)
@@ -21,13 +21,13 @@ for i = 1:numel(dependencies)
         error([nn,'ACHTUNG!!! ',dependencies{i},' appears to be missing!!!']);
     end
 end
-disp([s.nn,'System appears ready!!! Loading parameters...']);
+disp([s.cn,'System appears ready!!! Loading parameters...']);
 
 
 % Read parameter file
 [p,idx] = update_subtomo_param(s ,rootdir,paramfilename);
 if isempty(idx)
-    error([s.nn,'ACHTUNG!!! All jobs in param file are finished!!!']);
+    error([s.cn,'ACHTUNG!!! All jobs in param file are finished!!!']);
 end
 
 
@@ -53,15 +53,21 @@ system(['mkdir ',p(idx).rootdir,'/blank/']);
 if ~isempty(submit_cmd)
     
     % Clear folders
-    system(['rm -f ',p(idx).rootdir,'/',o.commdir,'/*']);
+    system(['rm -rf ',p(idx).rootdir,'/',o.commdir,'/*']);
     
     % Submit job
-    disp([s.nn,'Submitting job...']);
-    system(submit_cmd);
+    disp([s.cn,'Submitting job...']);
+    [status,cmdout] = system(submit_cmd);
+    disp(cmdout);
+    
+    % Check for status error
+    if status ~= 0
+        error([s.cn,'ACHTUNG!!! Error in submitting job!!!1!']);
+    end
     
 else
     
-    disp([s.nn,'No submission command given... Watching pre-submitted job...']);    
+    disp([s.cn,'No submission command given... Watching pre-submitted job...']);    
     
 end
 
@@ -89,7 +95,7 @@ while run
     %%%%% Subtomogram Alignment %%%%%
         
     if ~p(idx).completed_ali && strcmp(mode{1},'ali')
-        disp([s.nn,'Starting subtomogram alignment...']);
+        disp([s.cn,'Starting subtomogram alignment...']);
         
         % Parse job size
         if p(idx).subset < 100
@@ -102,7 +108,7 @@ while run
         watch_progress(p,o,s,idx,'aliprog',total_size,false,'subtomograms aligned...',20);
         
         % Wait for step to complete
-        fprintf('\n%s\n',[s.nn,'All subtomograms aligned!!! Waiting for completion of alignment step...']);
+        fprintf('\n%s\n',[s.cn,'All subtomograms aligned!!! Waiting for completion of alignment step...']);
         wait_for_it([p(idx).rootdir,'/',o.commdir,'/'],'complete_stopgap_ali',s.wait_time);
         
         % Refresh param file
@@ -111,7 +117,7 @@ while run
         % Read allmotl file
         o = load_motivelist(p,o,s,idx);
         
-        fprintf('%s\n\n',[s.nn,'Subtomogram alignment complete!!!']);
+        fprintf('%s\n\n',[s.cn,'Subtomogram alignment complete!!!']);
         
         
     end
@@ -119,7 +125,7 @@ while run
     
     %%%%% Parallel Averaging %%%%%
     if ~p(idx).completed_p_avg
-        disp([s.nn,'Starting parallel averaging...']);
+        disp([s.cn,'Starting parallel averaging...']);
         
         % Determine number of parallel cores
         switch mode{1}
@@ -128,14 +134,16 @@ while run
             case 'avg'
                 n_cores_p_avg =  o.n_cores;
         end
+%         wait_for_it([p(idx).rootdir,'/',o.commdir],['n_p_avg_',num2str(p(idx).iteration)],s.wait_time);
+%         n_cores_p_avg = csvread([p(idx).rootdir,o.commdir,'n_p_avg_',num2str(p(idx).iteration)]);
         
         % Wait until parallel averaging completion
         watch_for_files(p,o,s,idx,'sg_p_avg',n_cores_p_avg,' parallel averages completed...');
-        fprintf('\n%s\n',[s.nn,'Parallel averages written!!! Waiting for completion of parallel averaging step...']);
+        fprintf('\n%s\n',[s.cn,'Parallel averages written!!! Waiting for completion of parallel averaging step...']);
         
         % Wait for it
         wait_for_it([p(idx).rootdir,'/',o.commdir],'complete_stopgap_p_avg',s.wait_time);
-        fprintf('%s\n\n',[s.nn,'Parallel averaging complete!!!']);
+        fprintf('%s\n\n',[s.cn,'Parallel averaging complete!!!']);
         
         % Refresh param file
         [p, idx] = update_subtomo_param(s,rootdir,paramfilename);
@@ -145,12 +153,12 @@ while run
 
     %%%%% Final Averaging %%%%%
     if ~p(idx).completed_f_avg
-        disp([s.nn,'Starting final averaging...']);
+        disp([s.cn,'Starting final averaging...']);
         
         
         % Wait until final averaging completion
         watch_for_files(p,o,s,idx,'sg_f_avg',o.n_classes,' final averages written...');
-        fprintf('\n%s\n',[s.nn,'All final averages written!!! Cleaning up iteration...']);
+        fprintf('\n%s\n',[s.cn,'All final averages written!!! Cleaning up iteration...']);
         
         % Wait for it
         wait_for_it([p(idx).rootdir,'/',o.commdir],'complete_stopgap_f_avg',s.wait_time);
@@ -168,11 +176,11 @@ while run
         
     % Check for end of run and refresh parameters if necessary
     if isempty(idx)
-        disp([s.nn,'End of param file reached... ']);
+        disp([s.cn,'End of param file reached... ']);
         % End of param file reached; time to die
         run = false;
     elseif idx > size(p,1)
-        disp([s.nn,'End of param file reached... ']);
+        disp([s.cn,'End of param file reached... ']);
         % End of param file reached; time to die
         run = false;
     end

@@ -7,10 +7,60 @@ function o = prepare_parallel_tm(p,o,s,idx)
 
 
 %% Initialize volumes for run
-disp([s.nn,'Initialing parameters for parallel template matching...']);
+disp([s.cn,'Initialing parameters for parallel template matching...']);
+
+% Check for local copy
+if o.copy_local  
+    
+    % Parse filename
+    [path,name,ext] = fileparts(p(idx).tomo_name);  % Parse remote path
+    tomo_file_name = [name,ext];                    % Parse filename
+    o.tomo_name = [o.rootdir,tomo_file_name];       % Generate local path
+    
+    % Copy tomogram    
+    if o.copy_core
+        disp([s.cn,'Copying tomogram ',o.tomo_name,' to local temporary directory...']);
+        time = copy_file_to_local_temp(o.copy_core,[path,'/'],o.rootdir,'copy_comm/',['tomo_',num2str(p(idx).tomo_num),'_copied'],s.wait_time,tomo_file_name,false);        
+        disp([s.cn,'Tomogram copied in ',num2str(time),' seconds!!!']);
+    else 
+        disp([s.cn,'Waiting for tomogram ',o.tomo_name,' to be copied to local temporary directory...']);
+        copy_file_to_local_temp(o.copy_core,[path,'/'],o.rootdir,'copy_comm/',['tomo_',num2str(p(idx).tomo_num),'_copied'],s.wait_time,tomo_file_name,false);        
+    end
+    
+    
+    % Check for tomogram mask
+    if sg_check_param(p(idx),'tomo_mask_name')
+        
+        % Parse filename
+        [path,name,ext] = fileparts(p(idx).tomo_mask_name);  % Parse remote path
+        tomo_mask_file_name = [name,ext];                         % Parse filename
+        o.tomo_mask_name = [o.rootdir,tomo_mask_file_name];            % Generate local path
+        
+        % Copy tomogram mask
+        if o.copy_core
+            disp([s.cn,'Copying tomogram ',o.tomo_mask_name,' to local temporary directory...']);
+            time = copy_file_to_local_temp(o.copy_core,[path,'/'],o.rootdir,'copy_comm/',['tomo_',num2str(p(idx).tomo_num),'mask_copied'],s.wait_time,tomo_mask_file_name,false);        
+            disp([s.cn,'Tomogram copied in ',num2str(time),' seconds!!!']);
+        else 
+            disp([s.cn,'Waiting for tomogram ',o.tomo_mask_name,' to be copied to local temporary directory...']);
+            copy_file_to_local_temp(o.copy_core,[path,'/'],o.rootdir,'copy_comm/',['tomo_',num2str(p(idx).tomo_num),'mask_copied'],s.wait_time,tomo_mask_file_name,false);        
+        end
+    end
+      
+    
+    
+else
+    
+    % Set remote path
+    o.tomo_name = p(idx).tomo_name;
+    if sg_check_param(p(idx),'tomo_mask_name')
+        o.tomo_mask_name = p(idx).tomo_mask_name;
+    end
+end
+
 
 % Get tomogram header
-header = sg_read_mrc_header(p(idx).tomo_name);
+header = sg_read_mrc_header(o.tomo_name);
 
 % Parse tomogram size
 o.tomo_size = double([header.nx,header.ny,header.nz]);

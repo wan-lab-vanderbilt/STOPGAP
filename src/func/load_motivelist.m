@@ -22,7 +22,7 @@ end
 
 % Parse motivelist name
 o.motl_name = [o.listdir,'/',p(idx).motl_name,'_',num2str(iteration),'.star'];
-disp([s.nn,'Loading motivelist: ',o.motl_name]);
+disp([s.cn,'Loading motivelist: ',o.motl_name]);
 
 
 % Read motive list

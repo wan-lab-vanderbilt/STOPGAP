@@ -7,7 +7,7 @@ function o = tm_check_mask(p,o,s,idx)
 % WW 03-2019
 
 %% Check mask
-disp([s.nn,'Tomogram mask detected...']);
+disp([s.cn,'Tomogram mask detected...']);
 
 % Parse Z-index name
 idx_name = ['tomo',num2str(p(idx).tomo_num),'_bounds.csv'];
@@ -15,10 +15,10 @@ idx_name = ['tomo',num2str(p(idx).tomo_num),'_bounds.csv'];
 
 % Determine Z-indices
 if o.procnum == 1
-    disp([s.nn,'Reading in tomogram mask...']);
+    disp([s.cn,'Reading in tomogram mask...']);
     
     % Read mask
-    mask = sg_mrcread(p(idx).tomo_mask_name);
+    mask = sg_mrcread(o.tomo_mask_name);
         
     % Get projections    
     proj = cell(3,1);
@@ -41,18 +41,18 @@ if o.procnum == 1
     dlmwrite([p(idx).rootdir,'/',o.tempdir,'/',idx_name,'.temp'],o.bounds);
     system(['mv ',p(idx).rootdir,'/',o.tempdir,idx_name,'.temp ',p(idx).rootdir,'/',o.tempdir,'/',idx_name]);
     
-    disp([s.nn,'Boundaries of tomogram mask determined!!!']);
+    disp([s.cn,'Boundaries of tomogram mask determined!!!']);
     
     
 else
-    disp([s.nn,'Waiting for boundaries of tomogram mask...']);
+    disp([s.cn,'Waiting for boundaries of tomogram mask...']);
     
     % Wait for indices
     wait_for_it([p(idx).rootdir,'/',o.tempdir],idx_name,s.wait_time);
     
     % Read indices
     o.bounds = dlmread([p(idx).rootdir,'/',o.tempdir,'/',idx_name]);
-    disp([s.nn,'Boundaries of tomogram mask read...']);
+    disp([s.cn,'Boundaries of tomogram mask read...']);
     
 end
 

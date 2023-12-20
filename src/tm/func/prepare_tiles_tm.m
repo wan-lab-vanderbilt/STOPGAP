@@ -8,7 +8,7 @@ function v = prepare_tiles_tm(p,idx,o,f,v)
 
 
 % Calculate Laplacian of template
-if sg_check_param(p(idx),'apply_laplacian');
+if sg_check_param(p(idx),'apply_laplacian')
     v.tile = del2(v.tile);
 end
 

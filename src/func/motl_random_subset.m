@@ -1,4 +1,3 @@
-
 function o = motl_random_subset(p,o,s,idx)
 %% motl_random_subset
 % A function to pseduo randomly generate a subset of motivelist entries.
@@ -6,7 +5,7 @@ function o = motl_random_subset(p,o,s,idx)
 % WW 06-2019
 
 %% Generate random subset
-disp([s.nn,'Generating random subset of motivelist entries...']);
+disp([s.cn,'Generating random subset of motivelist entries...']);
 
 % New number of subtomograms
 o.n_rand_motls = round_to_even(o.n_motls*(p(idx).subset/100));
@@ -19,7 +18,7 @@ switch o.halfset_mode
         % Generate randomized indices
         rng(o.rseed,'twister');
         temp_idx = randperm(o.n_motls);
-        r_idx = sort(temp_idx(1:o.n_rand_motl));
+        r_idx = sort(temp_idx(1:o.n_rand_motls));
         
         
     case 'split'

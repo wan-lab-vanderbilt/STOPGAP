@@ -8,14 +8,9 @@ function stopgap_watcher(rootdir,paramfilename,n_cores, submit_cmd)
 % a submit_cmd, which then causes the watcher to watch an already running 
 % job. 
 %
-% WW 06-2019
+% WW 12-2023
 
 
-% % % % % % % % DEBUG
-% rootdir = '/fs/pool/pool-plitzko/will_wan/test_sg_0.7.1/tm_test/';
-% paramfilename = 'params/pca_param.star';
-% n_cores = 128;
-% submit_cmd = [];
 
 
 %% Check input
@@ -27,13 +22,19 @@ if (ischar(n_cores)); n_cores=eval(n_cores); end
 if nargin == 3
     submit_cmd = [];
 elseif (nargin < 3) || (nargin > 4)
-    error([s.nn,'ACHTUNG!!! Incorrect number of inputs!!!']);
+    error([s.cn,'ACHTUNG!!! Incorrect number of inputs!!!']);
 end
+
+% Check slash
+rootdir = sg_check_dir_slash(rootdir);
+
+% Clear crash files
+system(['rm -f ',rootdir,'crash_*']);
 
 %% Determine task
 
 % Parse data block name from param file
-star_name = [rootdir,'/',paramfilename];
+star_name = [rootdir,paramfilename];
 db_name = get_star_data_block(star_name);
 
 
@@ -44,6 +45,10 @@ switch db_name
     % Run subtomogram alignment/averaging
     case 'stopgap_subtomo_parameters'
         subtomo_watcher(rootdir,paramfilename, n_cores, submit_cmd);
+        
+    % Run subtomogram extraction
+    case 'stopgap_extract_parameters'
+        stopgap_extract_watcher(rootdir,paramfilename,n_cores, submit_cmd);
         
     % Run template matching
     case 'stopgap_tm_parameters'
@@ -56,6 +61,10 @@ switch db_name
     % Run PCA
     case 'stopgap_pca_parameters'
         pca_watcher(rootdir,paramfilename,n_cores, submit_cmd);
+        
+    % Run tube power spectra
+    case 'stopgap_tps_parameters'
+        tps_watcher(rootdir,paramfilename,n_cores, submit_cmd);
         
 end
 

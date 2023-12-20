@@ -14,7 +14,7 @@ boxsize = size(vol,1);
 r_cut = round((boxsize*pixelsize)/resolution);
 
 % Calculate filter
-filter = ifftshift(tom_sphere([boxsize,boxsize,boxsize],r_cut));
+filter = ifftshift(sg_sphere([boxsize,boxsize,boxsize],r_cut));
 
 % Apply filter
 filt_vol = real(ifftn(fftn(vol).*filter));

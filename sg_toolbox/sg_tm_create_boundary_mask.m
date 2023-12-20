@@ -20,11 +20,11 @@ function mask = sg_tm_create_boundary_mask(tomo,boundary,xy_border)
 %
 % This function uses the "affine_fit.m" function 
 %
-% WW 02-2019
+% WW 05-2021
 
 % % % % % DEBUG
-% tomo = '/fs/pool/pool-plitzko/will_wan/jonathan/Good_Tomo_OE_20180814_tomo_14/links/14.rec';
-% boundary = '14_boundary.txt';
+% tomo = '51.mrc';
+boundary = '1_boundary.txt';
 
 %% Check check
 
@@ -80,6 +80,10 @@ end
 % Calculate 
 Z_top =  - (n_1(1)/n_1(3)*X+n_1(2)/n_1(3)*Y-dot(n_1,p_1)/n_1(3));
 Z_bottom =  - (n_2(1)/n_2(3)*X+n_2(2)/n_2(3)*Y-dot(n_2,p_2)/n_2(3));
+
+% Threshold tomogram limits
+Z_top(Z_top > dims(3)) = dims(3);
+Z_bottom(Z_bottom < 1) = 1;
 
 
 %% Generate mask

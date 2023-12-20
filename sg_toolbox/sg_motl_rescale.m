@@ -69,7 +69,8 @@ for i = 1:3
     
     % Rounded positions and shifts
     pos = round(new_pos);
-    shift = pos - new_pos;
+%     shift = pos - new_pos;
+    shift = new_pos - pos;
     
     % Store values
     allmotl.(o_fields{i}) = pos;

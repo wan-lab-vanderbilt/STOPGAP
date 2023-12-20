@@ -33,7 +33,7 @@ end
 
 
 %% Initialize Fourier cropping arrays
-disp([s.nn,'Initializing indices for a Fourier cropped template matching...']);
+disp([s.cn,'Initializing indices for a Fourier cropped template matching...']);
 
 % Calcluate crop size for template filter
 [crop_tmpl_size, tmpl_fcrop] = determine_fcrop_size_from_bpf(o.tmpl_bpf);
@@ -44,7 +44,7 @@ if tmpl_fcrop
     o.tmpl_cen = floor(o.tmpl_size/2)+1;
     o.fcrop = true;
 else
-    warning([s.nn,'ACHTUNG!!! 3/2 Fourier pixels beyond the low pass filter is beyond the box edge. Fourier cropping will not be used.']);
+    warning([s.cn,'ACHTUNG!!! 3/2 Fourier pixels beyond the low pass filter is beyond the box edge. Fourier cropping will not be used.']);
     o.fcrop = false;
     return
 end

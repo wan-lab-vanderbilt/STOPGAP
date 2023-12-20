@@ -48,10 +48,16 @@ for i = 1:n_vol
     
     % Refresh volume
     if refresh
+        % Parse volume name
+        name = [o.(vol_list{i,3}),'/',p(idx).(vol_list{i,1})];        
         
-        % Read volume
-        name = [o.(vol_list{i,3}),'/',p(idx).(vol_list{i,1})];
-        o.(vol_list{i,2}) = read_vol(s,p(idx).rootdir,name);
+        % Check for local copy
+        if o.copy_local
+            copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/',[vol_list{i,2},'_copied'],s.wait_time,name,false);
+        end
+        
+        % Read volume        
+        o.(vol_list{i,2}) = read_vol(s,o.rootdir,name);
         
         % Fourier crop
         if vol_list{i,4} && o.fcrop

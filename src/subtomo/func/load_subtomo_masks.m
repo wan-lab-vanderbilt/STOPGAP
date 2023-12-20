@@ -26,7 +26,7 @@ switch mode{2}
 end
 
 %% Load masks
-disp([s.nn,'Loading masks...']);
+disp([s.cn,'Loading masks...']);
 
 % Parse mask names
 mask_names = {o.reflist.mask_name};
@@ -41,9 +41,16 @@ for i = 1:o.n_classes
         % Check for loaded masks
         if i == 1
             
-            % Load first mask
+            % Parse mask name
             mask_name = [o.maskdir,'/',mask_names{ref_idx(i)}];
-            o.mask{i} = read_vol(s,p(idx).rootdir,mask_name);
+            
+            % Check for local copy
+            if o.copy_local
+                copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/',['mask_',num2str(i),'_copied'],s.wait_time,mask_name,false);
+            end
+            
+            % Load first mask
+            o.mask{i} = read_vol(s,o.rootdir,mask_name);
             
             % Resize mask
             if sg_check_param(o,'fcrop')
@@ -62,9 +69,16 @@ for i = 1:o.n_classes
                 
             else
                 
-                % Load first mask
+                % Parse mask name
                 mask_name = [o.maskdir,'/',mask_names{ref_idx(i)}];
-                o.mask{i} = read_vol(s,p(idx).rootdir,mask_name);
+                
+                % Check for local copy
+                if o.copy_local
+                    copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/',['mask_',num2str(i),'_copied'],s.wait_time,mask_name,false);
+                end
+                
+                % Load next mask
+                o.mask{i} = read_vol(s,o.rootdir,mask_name);
 
                 % Resize mask
                 if sg_check_param(o,'fcrop')
@@ -83,13 +97,23 @@ if strcmp(mode{1},'avg') || p(idx).completed_ali
     % Check for spectral mask
     if sg_check_param(p(idx),'ps_name')
         % Read mask
-        if ~sg_check_param(o,'specmask');
-            o.specmask = read_vol(s,p(idx).rootdir,[o.maskdir,'/',p(idx).specmask_name]);
+        if ~sg_check_param(o,'specmask')
+            % Parse name
+            specmask_name = [o.maskdir,'/',p(idx).specmask_name];
+            
+            % Check for local copy
+            if o.copy_local
+                copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/',['specmask_copied'],s.wait_time,specmask_name,false);
+            end
+                
+            % Read mask
+            o.specmask = read_vol(s,o.rootdir,specmask_name);
+            
         end
         % Check supersampling
         if sg_check_param(o,'avg_ss')
             if o.avg_ss > 1
-                o.specmask = sg_rescale_volume_realspace(o.specmask,o.avg_ss);
+                o.specmask = sg_rescale_volume_realspace(o.specmask,o.boxsize.*o.avg_ss);
             end
         end
     end

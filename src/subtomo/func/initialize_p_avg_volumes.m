@@ -5,7 +5,7 @@ function v = initialize_p_avg_volumes(p,o,s,idx,mode,class)
 % WW 05-2018
 
 %% Initalize
-disp([s.nn,'Initialzing parallel averaging volumes...']);
+disp([s.cn,'Initialzing parallel averaging volumes...']);
 
 % Initialize struct
 v = struct();

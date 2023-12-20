@@ -38,7 +38,7 @@ switch motl_fields{f_idx,3}
     case 'float'
         
         if isnumeric(value) || islogical(value)
-            value = repmat(num2cell(double(value)),[rep_val,1]);
+            value = repmat(num2cell(single(value)),[rep_val,1]);
         elseif ischar(value)
             error('ACHTUNG!!! You are trying to store strings into a "float" field!!!');
         elseif iscell
@@ -52,7 +52,7 @@ switch motl_fields{f_idx,3}
     case 'int'
         
         if isnumeric(value) || islogical(value)
-            value = repmat(num2cell(int64(value)),[rep_val,1]);
+            value = repmat(num2cell(int32(value)),[rep_val,1]);
         elseif ischar(value)
             error('ACHTUNG!!! You are trying to store strings into an "int" field!!!');
         elseif iscell

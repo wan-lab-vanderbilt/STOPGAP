@@ -6,7 +6,7 @@ function pca_assemble_ccmatrix(p,o,s,idx)
 
 
 %% Initialize
-disp([s.nn,'Assembling CC-matrices...']);
+disp([s.cn,'Assembling CC-matrices...']);
 
 % Take lower half of identity matrix
 mat = tril(true(o.n_subtomos,o.n_subtomos),-1);
@@ -51,7 +51,7 @@ for i = o.filt_jobs
 
     % Write checkjob
     system(['touch ',p(idx).rootdir,'/',o.commdir,'/sg_pca_ccmatrix_',num2str(i)]);
-    disp([s.nn,num2str(i),' out of ',num2str(o.n_filt),' CC-matrices assembled!!!']);
+    disp([s.cn,num2str(i),' out of ',num2str(o.n_filt),' CC-matrices assembled!!!']);
 
 end
 

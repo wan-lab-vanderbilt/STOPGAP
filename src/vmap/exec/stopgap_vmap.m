@@ -1,4 +1,4 @@
-function stopgap_vmap(rootdir,param_name, procnum, n_cores)
+function stopgap_vmap(s)
 %% stopgap_vmap
 % Caculate a variance map using STOPGAP. Variance maps are caculated using
 % Ben Himes' method of amplitude-weigthed phase differences.
@@ -6,44 +6,27 @@ function stopgap_vmap(rootdir,param_name, procnum, n_cores)
 % WW 06-2019
 
 
-% % % % % % DEBUG
-% rootdir = '/fs/gpfs06/lv03/fileset01/pool/pool-plitzko/will_wan/empiar_10064/subtomo/mixedCTF/bin2/sg_0.7/';
-% param_name = 'params/vmap_param.star';
-% procnum = '1';
-% n_cores = 240;
-
-
-%% Evaluate numeric inputs
-if (ischar(procnum)); procnum=eval(procnum); end
-if (ischar(n_cores)); n_cores=eval(n_cores); end
 
 
 %% Initialize
-
-% Intialize settings struct
-s = struct();
-
-% Initialize node name
-s.nn = ['Node',num2str(procnum),': '];
-
-disp([s.nn,'Initializing...']);
+disp([s.cn,'Initializing...']);
 
 % Read parameter file
-disp([s.nn,'Reading parameter file...']);
+disp([s.cn,'Reading parameter file...']);
 [p, idx] = update_vmap_param(s,rootdir,param_name);
 if isempty(idx)
-    error([s.nn,'ACHTUNG!!! All jobs in param file are finished!!!']);
+    error([s.cn,'ACHTUNG!!! All jobs in param file are finished!!!']);
 end
 
 % Read settings
-disp([s.nn,'Reading settings...']);
+disp([s.cn,'Reading settings...']);
 s = sg_get_vmap_settings(s,p(idx).rootdir,'settings.txt');
 
 
 % Initialize struct array to hold objects
 o = struct();
-o.procnum = procnum;
-o.n_cores = n_cores;
+o.procnum = s.procnum;
+o.n_cores = s.n_cores;
 o = sg_parse_vmap_directories(p,o,s,idx);
 
 % Cleanup comm folder
@@ -77,7 +60,7 @@ while run
         t = processing_timer(t,'start',p,o,idx,'p_vmap');
 
         % Run parallel average
-        disp([s.nn,'Begin parallel variance calculation...']);
+        disp([s.cn,'Begin parallel variance calculation...']);
         parallel_vmap(p,o,s,idx);
 
         % Write timings
@@ -88,15 +71,15 @@ while run
         if o.procnum == 1
             complete_parallel_vmap(rootdir,param_name,p,o,s,idx);
         else
-            disp([s.nn,'test 0']);
+            disp([s.cn,'test 0']);
             wait_for_it([p(idx).rootdir,'/',o.commdir],'complete_stopgap_p_vmap',s.wait_time);
         end
-        disp([s.nn,'Parallel variance complete!!!']);
+        disp([s.cn,'Parallel variance complete!!!']);
         
         
     end
 
-    disp([s.nn,'test 1...']);
+    disp([s.cn,'test 1...']);
 
     % Final concatenation
     if o.f_avg_node
@@ -112,13 +95,13 @@ while run
         processing_timer(t,'end',p,o,idx,'f_vmap');
     end
 
-     disp([s.nn,'test 2...']);
+     disp([s.cn,'test 2...']);
     
     % Wait for completion
     if o.procnum == 1
         complete_final_vmap(rootdir,param_name,p,o,s,idx);
     else
-        disp([s.nn,'Non-final-averaging node... waiting for final maps...']);
+        disp([s.cn,'Non-final-averaging node... waiting for final maps...']);
         wait_for_it([p(idx).rootdir,'/',o.commdir],'complete_stopgap_f_vmap',s.wait_time);
     end
     
@@ -129,7 +112,7 @@ while run
     
     % Check for end of run and refresh parameters if necessary
     if isempty(idx)
-        disp([s.nn,'End of param file reached... ']);
+        disp([s.cn,'End of param file reached... ']);
         % End of param file reached; time to die
         run = false;
     end

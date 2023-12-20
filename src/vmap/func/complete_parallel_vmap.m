@@ -10,14 +10,14 @@ function complete_parallel_vmap(rootdir,param_name,p,o,s,idx)
   
 
 % Wait until parallel variance completion
-disp([s.nn,' Waiting for parallel variance calculation to complete...']);
+disp([s.cn,' Waiting for parallel variance calculation to complete...']);
 wait_for_them([p(idx).rootdir,'/',o.commdir],'sg_p_vmap',o.n_cores,s.wait_time);
 
 % Compile time
 compile_vmap_timings(p,o,idx,'p_vmap');
 
 % Update param file
-disp([s.nn,' Parallel variance calculations complete! Updataing parameter file...']);
+disp([s.cn,' Parallel variance calculations complete! Updataing parameter file...']);
 [p,idx] = update_vmap_param(s,rootdir, param_name, idx, 'p_vmap');
 
 
@@ -25,5 +25,5 @@ disp([s.nn,' Parallel variance calculations complete! Updataing parameter file..
 system(['rm -f ',p(idx).rootdir,'/',o.commdir,'/sg_p_vmap_*']);
 system(['rm -f ',p(idx).rootdir,'/',o.commdir,'/complete_stopgap_f_vmap']);    % Prevents overrun at next step...
 system(['touch ',p(idx).rootdir,'/',o.commdir,'/complete_stopgap_p_vmap']);
-disp([s.nn,'Parallel variance calculations complete!!!']);
+disp([s.cn,'Parallel variance calculations complete!!!']);
                         

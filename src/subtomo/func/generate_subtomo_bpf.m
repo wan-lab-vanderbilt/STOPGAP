@@ -6,7 +6,7 @@ function o = generate_subtomo_bpf(p,o,s,idx)
 
 %% Calculate bandpass filter
 
-disp([s.nn,'Calculating bandpass filter...']);
+disp([s.cn,'Calculating bandpass filter...']);
 
 % Check sigmas
 if isfield(p(idx),'lp_sigma')

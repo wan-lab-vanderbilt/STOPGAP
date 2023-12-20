@@ -41,6 +41,6 @@ system(['rm -f ',p(idx).rootdir,'/',o.tempdir,'/timer_eigenval*']);
 
 % Write completion file
 system(['touch ',p(idx).rootdir,'/',o.commdir,'/complete_sg_pca_eigenval']);
-disp([s.nn,'PCA Eigenvalue calculation complete!!!']);
+disp([s.cn,'PCA Eigenvalue calculation complete!!!']);
 
 

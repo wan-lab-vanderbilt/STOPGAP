@@ -30,7 +30,7 @@ end
 % Determine cropped boxsize
 [crop_dims,fcrop] = determine_fcrop_size_from_bpf(o.bpf);
 if ~fcrop
-    warning([s.nn,'ACHTUNG!!! 3/2 Fourier pixels beyond the low pass filter is beyond the box edge. Fourier cropping will not be used.']);
+    warning([s.cn,'ACHTUNG!!! 3/2 Fourier pixels beyond the low pass filter is beyond the box edge. Fourier cropping will not be used.']);
     o.fcrop = false;
     return
 else
@@ -40,7 +40,7 @@ end
 
 
 %% Initialize Fourier cropping arrays
-disp([s.nn,'Initializing indices for a Fourier cropped alignment run...']);
+disp([s.cn,'Initializing indices for a Fourier cropped alignment run...']);
 
 
 % Replace boxsizes
@@ -60,47 +60,8 @@ if size(o.bpf,1) ~= o.boxsize
 end
 
 
-% 
-% %% Rescale volumes using linear interpolation
-% 
-% % Volumes to rescale
-% rsres_vol = {'mask','mask2'};
-% 
-% % Rescale volumes
-% for i = 1:numel(rsres_vol)
-%     if isfield(o,rsres_vol{i})
-%         if size(o.(rsres_vol{i}),1) ~= o.boxsize
-%             temp_vol = sg_rescale_volume_realspace(o.(rsres_vol{i}),o.boxsize,'linear');
-%             o.(rsres_vol{i}) = temp_vol;
-%         end
-%     end
-% end
-% 
-% 
-% %% Rescale references using Fourier cropping
-% 
-% % Loop through each class
-% for i = 1:o.n_classes
-%     for j = 1:2
-%         if size(o.ref.(char(64+j)){i},1)
-%             temp = fourier_crop_volume(o.ref.(char(64+j)){i},o.f_idx);
-%             o.ref.(char(64+j)){i} = temp;
-%         end
-%     end
-% end
 
     
-
-
-
-
-
-
-
-
-
-
-
 
 
 

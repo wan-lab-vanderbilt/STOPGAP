@@ -13,6 +13,9 @@ function watch_for_files(p,o,s,idx,filename,n_files,msg)
 n_complete = 0;
 n_back = 0;
 
+% Initialize crash log array
+crash_log = false(o.n_cores,1);
+
 % Wait for files
 while n_complete < n_files
     pause(s.wait_time);
@@ -23,5 +26,8 @@ while n_complete < n_files
     % Display progress
     status = [num2str(n_complete),' out of ',num2str(n_files),msg];
     n_back = print_status(status, n_back);
+    
+    % Check for crashes
+    crash_log = check_crashes(p,idx,crash_log);
     
 end

@@ -19,7 +19,7 @@ end
 % Open file
 switch file
     case 'tomo'
-        fid = fopen(p(idx).tomo_name,'r',sysfor);
+        fid = fopen(o.tomo_name,'r',sysfor);
     case 'mask'
         fid = fopen(p(idx).tomo_mask_name,'r',sysfor);
 end

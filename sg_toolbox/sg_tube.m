@@ -58,7 +58,7 @@ window_3d = repmat(permute(window_z,[3,1,2]),[dims(1),dims(2),1]);
 %% Generate cylinder
 
 % Calculate circle
-annulus = sg_annulus(dims(1:2),inner_rad,outer_rad,sigma(1,2),center(1:2));
+annulus = sg_annulus(dims(1:2),inner_rad,outer_rad,sigma(1:2),center(1:2));
 
 % Generate cylinder
 cylinder = repmat(annulus,[1,1,dims(3)]).*window_3d;

@@ -87,7 +87,7 @@ for i = p_start:p_end
     % Increment completion counter
     [pc,rt_str] = progress_counter(pc,'count',n_p_subtomo,s.counter_pct);
     if ~isempty(rt_str)
-        disp([s.nn,'Job progress: ',num2str(pc.c),' out of ',num2str(n_p_subtomo),' subtomograms processed... ',rt_str]);
+        disp([s.cn,'Job progress: ',num2str(pc.c),' out of ',num2str(n_p_subtomo),' subtomograms processed... ',rt_str]);
     end
     
 end
@@ -108,7 +108,7 @@ end
 % Write checkjob
 % Write completion
 system(['touch ',p(idx).rootdir,'/',o.commdir,'/sg_pca_eigenval_',num2str(o.procnum)]);
-disp([s.nn,'Parallel eigenvalue calculation completed!!!1!']);
+disp([s.cn,'Parallel eigenvalue calculation completed!!!1!']);
 
 
 

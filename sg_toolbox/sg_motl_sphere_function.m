@@ -69,22 +69,26 @@ n_motls = size(psi_the,2);
 
 
 % Initialize motl
-motl = sg_initialize_motl(n_motls);
+motl = sg_initialize_motl2(n_motls);
 
 % Store eulers
 if rand_phi
-    motl = sg_motl_fill_field(motl,'phi',(rand(1,n_motls).*360));
+%     motl = sg_motl_fill_field(motl,'phi',(rand(1,n_motls).*360));
+    motl.phi = (rand(1,n_motls).*360);
 else 
-    motl = sg_motl_fill_field(motl,'phi',0);
+%     motl = sg_motl_fill_field(motl,'phi',0);
+    motl.phi = 0;
 end
-motl = sg_motl_fill_field(motl,'psi',psi_the(1,:));
-motl = sg_motl_fill_field(motl,'the',psi_the(2,:));
+% motl = sg_motl_fill_field(motl,'psi',psi_the(1,:));
+% motl = sg_motl_fill_field(motl,'the',psi_the(2,:));
+motl.psi = psi_the(1,:);
+motl.the = psi_the(2,:);
 
 % Generate coordinates
 coord = zeros(3,n_motls);
 for i = 1:n_motls
     % Rotate point on top of sphere
-    coord(:,i) = tom_pointrotate([0,0,radius],motl(i).phi,motl(i).psi,motl(i).the)';
+    coord(:,i) = tom_pointrotate([0,0,radius],motl.phi(i),motl.psi(i),motl.the(i))';
 end
 coord = coord + repmat(center(:),[1,n_motls]);
 
@@ -94,11 +98,13 @@ pos = round(coord);
 shifts = coord - pos;
 
 % Store coordinates
-motl = sg_motl_fill_field(motl,'orig_x',pos(1,:));
-motl = sg_motl_fill_field(motl,'orig_y',pos(2,:));
-motl = sg_motl_fill_field(motl,'orig_z',pos(3,:));
-motl = sg_motl_fill_field(motl,'x_shift',shifts(1,:));
-motl = sg_motl_fill_field(motl,'y_shift',shifts(2,:));
-motl = sg_motl_fill_field(motl,'z_shift',shifts(3,:));
+motl.orig_x = single(pos(1,:)');
+motl.orig_y = single(pos(2,:)');
+motl.orig_z = single(pos(3,:)');
+motl.x_shift = single(shifts(1,:)');
+motl.y_shift = single(shifts(2,:)');
+motl.z_shift = single(shifts(3,:)');
+
+
 
 

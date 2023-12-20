@@ -4,7 +4,7 @@ function compile_subtomo_timings(p,o,idx,mode)
 %
 % WW 09-2018
 
-%% Compile timings
+%% Compile core timings
 
 % Concatenate and read timing files
 split_names = [p(idx).rootdir,'/',o.tempdir,'/timer_',mode,'_',num2str(p(idx).iteration),'_*'];
@@ -32,6 +32,63 @@ end
 
 % Write output
 stopgap_star_write(timing_struct, star_name, 'stopgap_subtomo_timings', [], 4, 2);
+
+%% Compile subtomo alignment timings
+
+if strcmp(mode,'ali')
+   
+%     % Initialize timing array
+%     time_array = zeros(o.n_ali_motls,10,'single');
+% 
+%     % Compile array
+%     for i = 1:o.n_cores
+%        time_array = time_array + csvread([p(idx).rootdir,o.tempdir,'ali_timings_',num2str(p(idx).iteration+1),'_',num2str(i),'.csv']); 
+%     end
+
+    % Check for subset processing
+    subset = false;
+    if sg_check_param(p(idx),'subset')
+        if p(idx).subset < 100
+            subset = true;
+        end
+    end
+    
+    % Initialize timing array
+    if subset
+        time_array = zeros(o.n_rand_motls,10,'single');
+    else
+        time_array = zeros(o.n_motls,10,'single');
+    end
+    
+    % Compile array
+    c = 1;  % Counter
+    % Get list of .csv files
+    d = dir([p(idx).rootdir,o.tempdir,'ali_timings_',num2str(p(idx).iteration+1),'_*.csv']);
+    for i = 1:numel(d)
+        % Check for empty file
+        if d(i).bytes ~= 0
+        % Read in time file
+%         temp_time = csvread([p(idx).rootdir,o.tempdir,'ali_timings_',num2str(p(idx).iteration+1),'_',num2str(i),'.csv']);
+        temp_time = csvread([d(i).folder,'/',d(i).name]);
+        % Number of motls
+        n_motls = size(temp_time,1);
+        % Store times
+        time_array(c:(c+n_motls-1),:) = temp_time;
+        % Increment counter
+        c = c + n_motls;
+        end
+    end
+    
+    % Sort array by procnum, packet ID, motl_num
+    time_array = sortrows(time_array,[1,4,5]);
+    
+    % Write output
+    csvwrite([p(idx).rootdir,'/',o.metadir,'/ali_timings_',num2str(p(idx).iteration+1),'.csv'],time_array);
+    
+    
+end
+
+
 
 
 end

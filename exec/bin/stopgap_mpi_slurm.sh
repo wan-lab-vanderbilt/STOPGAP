@@ -4,21 +4,35 @@
 # proper parallelization variables. This is either when
 # using mpirun or srun with slurm.
 #
-# WW 04-2019
+# WW 12-2023
 
-# Source libraries
-source $STOPGAPHOME/lib/stopgap_config.sh 
 
 # Bash parameters
-set -e              # Crash on error
+# set -e              # Crash on error
 set -o nounset      # Crash on unset variables
 
+# Load MATLAB module if necessary
+# module load MATLAB/2020b
 
 # Parse input arguments
 args=("$@")
 rootdir=${args[0]}
 paramfilename=${args[1]}
 n_cores=${args[2]}
+copy_local=${args[3]}
+run_type=${args[4]}
+
+
+# Source libraries
+if [ "${run_type}" = "local" ]; then
+    echo "Sourcing libraries for local run..."
+    source $STOPGAPHOME/lib/stopgap_config_local.sh 
+
+elif [ "${run_type}" = "slurm" ]; then
+    echo "Sourcing libraries for SLURM run..."
+    source $STOPGAPHOME/lib/stopgap_config_slurm.sh 
+
+fi
 
 
 # Get environmental parameters
@@ -28,36 +42,91 @@ if [[ ${mpi_test} ]]; then
     # For mpirun
     procnum=$OMPI_COMM_WORLD_RANK       # Get rank number
     node_name=$HOSTNAME
-    run_type=MPI
+    run_type="MPI"
+
 elif [[ ${slurm_test} ]]; then
     # For slurm
     procnum=$SLURM_PROCID       # Get rank number
-    node_name=$SLURMD_NODENAME
-    run_type=SLURM
+    node_name=$SLURMD_NODENAME  # Name of node
+    job_id=${SLURM_JOB_ID}       # Job ID
+    node_id=${SLURM_NODEID}     # Node ID
+    n_nodes=${SLURM_NNODES}     # Number of nodes
+    local_id=${SLURM_LOCALID}   # Local core ID on node
+    cpus_on_node=${SLURM_CPUS_ON_NODE}  # CPUs assigned to current node
+    run_type="SLURM"
+    node_id=$((node_id+1))              # Start node ID at one
+    local_id=$((local_id+1))            # Start local ID at one
+
 else
     echo "ACHTUNG!!! Could not obtain rank from Slurm or MPI variables!!!"
     exit 1
 fi
-# Set process number
+# Set ID numbers to start at 1
 procnum=$((procnum+1))              # Start rank number at one
-echo "Running using ${run_type}... procnum: $procnum - hostname: $node_name"
+
+
 
 # Go to root directory
 cd $rootdir
 
 
 # Set MCR directory
-if [ -d "/tmp/${USER}/mcr/stopgap_${procnum}" ]; then
-    rm -rf /tmp/${USER}/mcr/stopgap_${procnum}
+source $STOPGAPHOME/lib/stopgap_prepare_mcr.sh 
+
+
+
+# Run STOPGAP
+if [ $run_type = "MPI" ]; then
+    echo "Running using ${run_type}... procnum: $procnum - hostname: $node_name"
+
+        $STOPGAPHOME/lib/stopgap rootdir ${rootdir} paramfilename ${paramfilename} procnum ${procnum} n_cores ${n_cores} user_id ${UID} node_name ${node_name} n_nodes 1 local_id ${procnum} copy_local ${copy_local}
+
+elif [ $run_type = "SLURM" ]; then
+    echo "Running using ${run_type}... procnum: $procnum - hostname: $node_name - node_id: $SLURM_NODEID local_id: $SLURM_LOCALID - CPUs on Node: $SLURM_CPUS_ON_NODE"
+    
+    # Set local temporary directory
+    if [ $copy_local -gt 0 ]; then
+        if [ $local_id = 1 ]; then
+            
+            if [ $copy_local = 1 ]; then
+                echo "Using local temporary storage..."
+                source $STOPGAPHOME/lib/stopgap_prepare_local_temp.sh 
+            elif [ $copy_local -ge 2 ]; then
+                echo "Using persistent local storage..."
+                mkdir "/tmp/stopgap_u${UID}/" 
+                export LOCAL_TEMP="/tmp/stopgap_u${UID}/"                  
+            fi
+
+        else
+            echo "Using temporary local storage..."
+            export LOCAL_TEMP="/tmp/stopgap_u${UID}/"   
+        fi
+    fi
+
+
+    $STOPGAPHOME/lib/stopgap rootdir ${rootdir} paramfilename ${paramfilename} procnum ${procnum} n_cores ${n_cores} user_id ${UID} job_id ${job_id} node_name ${node_name} node_id ${node_id} n_nodes ${n_nodes} cpus_on_node ${cpus_on_node} local_id ${local_id} copy_local ${copy_local}
+
 fi
-mkdir -p /tmp/${USER}/mcr/stopgap_${procnum}
-export MCR_CACHE_ROOT="/tmp/${USER}/mcr/stopgap_${procnum}"
 
 
-# Run matlab script
-# /usr/bin/time -v 
-$STOPGAPHOME/lib/stopgap ${rootdir} ${paramfilename} ${procnum} ${n_cores}
+# Check for crash
+err=$?
+if [ 0 -ne $err ]; then
+    
+    # Crash file name
+    crash_name="${rootdir}/crash_${procnum}"
+
+	# Write crash file
+	if [ $run_type = "MPI" ]; then
+        echo "ACHTUNG!!!1! ${run_type} job crashed with code ${err} for procnum: $procnum - hostname: $node_name" | tee $crash_name >(cat >&2)
+
+    elif [ $run_type = "SLURM" ]; then
+        echo "ACHTUNG!!!1! ${run_type} job crashed with code ${err}  for procnum: $procnum - hostname: $node_name - node_id: $SLURM_NODEID local_id: $SLURM_LOCALID" | tee $crash_name >(cat >&2)
+    fi
+
+    exit ${err}
+fi
 
 
-# Cleanup
-rm -rf /tmp/${USER}/mcr/stopgap_${procnum}
+
+

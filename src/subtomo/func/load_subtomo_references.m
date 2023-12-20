@@ -19,7 +19,7 @@ switch mode{2}
     case 'singleref'
         if n_ref > 1
             if ~any(reflist_classes == 1)
-                error([s.nn,'ACHTUNG!!! Singleref mode requires a reference with class = 1 !!!']);
+                error([s.cn,'ACHTUNG!!! Singleref mode requires a reference with class = 1 !!!']);
             end
         end
         
@@ -28,7 +28,7 @@ switch mode{2}
         % Check for missing classes
         diff = setdiff(o.classes,reflist_classes);    % Extraneous classes are allowed
         if ~isempty(diff)
-            error([s.nn,'ACHTUNG!!! reflist is missing classes: ',num2str(reshape(diff,1,[])),'!!!']);
+            error([s.cn,'ACHTUNG!!! reflist is missing classes: ',num2str(reshape(diff,1,[])),'!!!']);
         end
 end
 
@@ -49,6 +49,7 @@ switch mode{2}
 end
 
 %% Load references
+disp([s.cn,'Loading references...']);
 
 % Parse initialization size
 if sg_check_param(o,'fcrop')
@@ -76,9 +77,14 @@ for h = 1:2
             else
                 ref_name = [o.refdir,'/',o.reflist(ref_idx).ref_name,'_',char(64+h),'_',num2str(p(idx).iteration),s.vol_ext];
             end
+                                  
+            % Check for local copy
+            if o.copy_local
+                copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/',['ref_',char(64+h),'_copied'],s.wait_time,ref_name,false);
+            end
             
             % Read reference
-            o.ref(1).(char(64+h)) = read_vol(s,p(idx).rootdir,ref_name);
+            o.ref(1).(char(64+h)) = read_vol(s,o.rootdir,ref_name);
 
             % Fourier crop
             if o.fcrop
@@ -106,10 +112,15 @@ for h = 1:2
                     ref_name = [o.refdir,'/',o.reflist(ref_idx(i)).ref_name,'_',char(64+h),'_',mode{3},'_',num2str(o.classes(i)),s.vol_ext];
                 else
                     ref_name = [o.refdir,'/',o.reflist(ref_idx(i)).ref_name,'_',char(64+h),'_',num2str(p(idx).iteration),'_',num2str(o.classes(i)),s.vol_ext];
+                end                                
+                
+                % Check for local copy
+                if o.copy_local
+                    copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/',['ref_',num2str(o.classes(i)),'_',char(64+h),'_copied'],s.wait_time,ref_name,false);
                 end
                 
                 % Read reference
-                o.ref(i).(char(64+h)) = read_vol(s,p(idx).rootdir,ref_name);
+                o.ref(i).(char(64+h)) = read_vol(s,o.rootdir,ref_name);
                 
                 % Fourier crop
                 if o.fcrop
@@ -135,6 +146,7 @@ o = load_subtomo_masks(p,o,s,idx,mode);
 
 
 %% Apply FOM
+disp([s.cn,'Calculating FSCs and applying FOM weighting...']);
 
 for i = 1:o.n_classes
     
@@ -179,6 +191,8 @@ end
 %% Appply laplacian
 
 if sg_check_param(p(idx),'apply_laplacian')
+    disp([s.cn,'Applying Laplacian operator to references...']);
+
     for i = 1:o.n_classes
         for j = 1:2
             o.ref(i).(char(64+j)) = del2(o.ref(i).(char(64+j)));

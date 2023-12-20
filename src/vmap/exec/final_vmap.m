@@ -6,7 +6,7 @@ function final_vmap(p,o,s,idx)
 % WW 09-2019
 
 %% Initialize
-disp([s.nn,'Calculate variance map for class ',num2str(o.f_avg_class),'!!!']);
+disp([s.cn,'Calculate variance map for class ',num2str(o.f_avg_class),'!!!']);
 
 
 % Number of subtomograms in each class
@@ -109,10 +109,10 @@ for i = 1:o.n_f_avg_class
 
     % Write checkjob
     system(['touch ',p(idx).rootdir,'/',o.commdir,'/sg_f_vmap_',num2str(o.f_avg_class(i))]);
-    disp([s.nn,'Final averaging on class ',num2str(o.f_avg_class(i)),' completed!!!1!']);
+    disp([s.cn,'Final averaging on class ',num2str(o.f_avg_class(i)),' completed!!!1!']);
     
 end
 
-disp([s.nn,'All classes averaged!!!']);
+disp([s.cn,'All classes averaged!!!']);
 
 

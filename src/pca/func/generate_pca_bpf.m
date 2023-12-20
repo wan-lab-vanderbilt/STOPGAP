@@ -5,7 +5,7 @@ function f = generate_pca_bpf(o,s)
 % WW 06-2019
 
 %% Generate filters
-disp([s.nn,'Generating bandpass filters...']);
+disp([s.cn,'Generating bandpass filters...']);
 
 % Initialize struct
 f = struct();

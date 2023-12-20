@@ -19,7 +19,7 @@ addParameter(parser,'param_name',[]);
 
            
 % Concatenate to parser paramters
-[parser_param,~] = sg_get_pca_input_arguments;
+[parser_param,param] = sg_get_pca_input_arguments;
 n_param = size(parser_param,2);
 
 % Add parameters
@@ -30,6 +30,21 @@ end
 % Parse arguments
 parse(parser,varargin{:});
 p = parser.Results;
+
+
+%% Check directory names
+
+% Number of directory inputs
+n_dir = size(param.dir,2);
+
+for i = 1:n_dir
+    % Check if field is filled
+    if sg_check_param(p,param.dir{1,i})
+        p.(param.dir{1,i}) = sg_check_dir_slash(p.(param.dir{1,i}));
+    end
+end
+
+
 
 %% Check required parameters
 

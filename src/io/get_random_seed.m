@@ -6,6 +6,7 @@ function o = get_random_seed(p,o,s,idx)
 % WW 07-2018
 
 %% Get random seed
+disp([s.cn,'Getting random seed...']);
 
 % For subtomogram averaging
 if isfield(p(idx),'subtomo_mode')

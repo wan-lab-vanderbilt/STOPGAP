@@ -9,7 +9,7 @@ function final_average(p,o,s,idx)
 
 %% Initialize
 
-disp([s.nn,'Begin final parallel averaging for class ',num2str(o.f_avg_class),'!!!']);
+disp([s.cn,'Begin final parallel averaging for class ',num2str(o.f_avg_class),'!!!']);
 
 % Parse mode
 mode = strsplit(p(idx).subtomo_mode,'_');
@@ -35,12 +35,14 @@ else
     m.fthresh = p(idx).fthresh;
 end
 
-% Real space mask to prevent edge artifacts
-% m.cube_mask = sg_cube_mask(o.ss_boxsize,3*o.avg_ss);
-m.cube_mask = sg_cube_mask(o.boxsize,3);
-
-% Calculate low pass filter, this filter takes out the last few high frequency pixels
-m.lpf = calculate_3d_bandpass_filter(o.boxsize,(floor(max(o.boxsize)./2)-4),2,0,0);
+% Calculate real and Fourier space masks
+if o.avg_ss > 1
+    m.cube_mask = sg_cube_mask(o.ss_boxsize,3*o.avg_ss);                                        % Real space mask to prevent edge artifacts
+    m.lpf = calculate_3d_bandpass_filter(o.ss_boxsize,(floor(max(o.ss_boxsize)./2)-4),2,0,0);   % Calculate low pass filter to roll of high-frequencies
+else
+    m.cube_mask = sg_cube_mask(o.boxsize,3);                                                    % Real space mask to prevent edge artifacts
+    m.lpf = calculate_3d_bandpass_filter(o.boxsize,(floor(max(o.boxsize)./2)-4),2,0,0);         % Calculate low pass filter to roll of high-frequencies
+end
 
 % Inidices for Fourier cropping 
 if o.avg_ss > 1
@@ -51,7 +53,7 @@ end
 
 % Loop through each class to be averaged
 for i = 1:o.n_f_avg_class
-    disp([s.nn,'Beginning final averaging on class: ',num2str(o.f_avg_class(i))]);
+    disp([s.cn,'Beginning final averaging on class: ',num2str(o.f_avg_class(i))]);
     
     
     
@@ -78,7 +80,7 @@ for i = 1:o.n_f_avg_class
         system(['touch ',p(idx).rootdir,'/',o.commdir,'/sg_f_avg_',num2str(o.f_avg_class(i))]);
         
         % Continue to next class
-        disp([s.nn,'Continuning to next averaging class...']);
+        disp([s.cn,'Continuning to next averaging class...']);
         continue
     end
     
@@ -87,17 +89,30 @@ for i = 1:o.n_f_avg_class
     
     
     %%%%% Generate averages %%%%%
-    disp([s.nn,'Summing partial averages...']);
+    disp([s.cn,'Summing partial averages...']);
+    
+    
     
     % Sum volumes
     for j = 1:numel(v.all_names)
-        
+        disp(['Summing partial averages for ',v.all_names{j}]);
+        % Initialize counter
+        pc = struct();
+        pc = progress_counter(pc,'init',o.n_cores_p_avg,s.counter_pct);
+            
         % Loop through cores
-        for k = reshape(o.p_avg_cores,1,[])
-    
+        for k = 1:o.n_cores_p_avg %reshape(o.p_avg_procnums,1,[])
+            
             % Add volume
             vol_name = [o.tempdir,'/',v.all_names{j},'_',num2str(k),s.vol_ext];
             v.(v.all_names{j}) = v.(v.all_names{j}) + read_vol(s,p(idx).rootdir,vol_name);
+            
+            
+            % Increment completion counter
+            [pc,rt_str] = progress_counter(pc,'count',o.n_cores_p_avg,s.counter_pct);
+            if ~isempty(rt_str)
+                disp([s.cn,'Job progress: ',num2str(pc.c),' out of ',num2str(o.n_cores_p_avg),' ',v.all_names{j}, ' for class ',num2str(i),' averaged... ',rt_str]);
+            end
             
         end
         
@@ -109,19 +124,34 @@ for i = 1:o.n_f_avg_class
         end
         v.(v.all_names{j}) = v.(v.all_names{j})/n_subtomos(class_idx,h);
         
-        % Downsample
-        if o.avg_ss > 1
-            v.(v.all_names{j}) = fourier_crop_volume(v.(v.all_names{j}),ss_f_idx);
-        end
+%         % Downsample
+%         if o.avg_ss > 1
+%             % Check for volume being summed
+%             if any(strcmp(v.all_names{1},v.ref_names))
+%                 % Fourier crop super-sampled references
+%                 v.(v.all_names{j}) = fourier_crop_volume(v.(v.all_names{j}),ss_f_idx);
+%             else
+%                 % Real-space crop filters
+%                 v.(v.all_names{j}) = sg_crop_volume(v.(v.all_names{j}),o.boxsize);
+%             end
+%         end
+        
+
         
     end
     
     % Fourier reweight volumes
     v = fourier_reweight_averages(p,o,v,m,idx);
     
+    % Downsample
+    if o.avg_ss > 1
+        for k = 1:2
+            v.(v.ref_names{k}) = fourier_crop_volume(v.(v.ref_names{k}),ss_f_idx);
+        end
+    end
     
     %%%%% Post process %%%%%
-    disp([s.nn,'Calculating FSC...']);
+    disp([s.cn,'Calculating FSC...']);
     
     % Calculate FSC
     [corr_fsc,fsc,mean_rfsc] = calculate_fsc(v.(v.ref_names{1}),v.(v.ref_names{2}),o.mask{class_idx},sym,s.fsc_fourier_cutoff,s.fsc_n_repeats);
@@ -138,7 +168,7 @@ for i = 1:o.n_f_avg_class
     
     
     %%%%% Write outputs %%%%%
-    disp([s.nn,'Writing output files...']);
+    disp([s.cn,'Writing output files...']);
     
     % Loop through halfsets
     for j = 1:2
@@ -186,10 +216,10 @@ for i = 1:o.n_f_avg_class
     system(['touch ',p(idx).rootdir,'/',o.commdir,'/sg_f_avg_',num2str(o.f_avg_class(i))]);
     
     
-    disp([s.nn,'Final averaging for class ',num2str(o.f_avg_class(i)),'complete!!!']);
+    disp([s.cn,'Final averaging for class ',num2str(o.f_avg_class(i)),'complete!!!']);
 end
 
-disp([s.nn,'All classes averaged!!!']);
+disp([s.cn,'All classes averaged!!!']);
 
     
 

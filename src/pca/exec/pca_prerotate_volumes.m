@@ -58,7 +58,7 @@ for i = p_start:p_end
     try
         subtomo = read_vol(s,p(idx).rootdir,subtomo_name);
     catch
-        error([s.nn,'ACHTUNG!!! Error reading file ',subtomo_name,'!!!']);
+        error([s.cn,'ACHTUNG!!! Error reading file ',subtomo_name,'!!!']);
     end
     
     % Normalize subtomogram
@@ -108,7 +108,7 @@ for i = p_start:p_end
     % Increment completion counter
     [pc,rt_str] = progress_counter(pc,'count',n_p_subtomo,s.counter_pct);
     if ~isempty(rt_str)
-        disp([s.nn,'Job progress: ',num2str(pc.c),' out of ',num2str(n_p_subtomo),' subtomograms rotated... ',rt_str]);
+        disp([s.cn,'Job progress: ',num2str(pc.c),' out of ',num2str(n_p_subtomo),' subtomograms rotated... ',rt_str]);
     end
     
 end
@@ -121,7 +121,7 @@ fclose(status);
 
 % Write completion
 system(['touch ',p(idx).rootdir,'/',o.commdir,'/sg_pca_rotvol_',num2str(o.procnum)]);
-disp([s.nn,'Parallel pre-rotation completed!!!1!']);
+disp([s.cn,'Parallel pre-rotation completed!!!1!']);
 
 
 

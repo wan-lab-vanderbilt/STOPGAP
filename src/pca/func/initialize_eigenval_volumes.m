@@ -6,7 +6,7 @@ function v = initialize_eigenval_volumes(p,o,s,idx,v)
 % WW 06-2019
 
 %% Initialize volumes
-disp([s.nn,'Reading eigenvolumes...']);
+disp([s.cn,'Reading eigenvolumes...']);
 
 
 % Read volumes and store FFTs

@@ -1,4 +1,4 @@
-function write_tm_param(param,rootdir,paramfilename)
+function sg_write_tm_param(param,rootdir,paramfilename)
 %% write_tm_param
 % Write stopgap param file to .star file with standard parameters.
 %

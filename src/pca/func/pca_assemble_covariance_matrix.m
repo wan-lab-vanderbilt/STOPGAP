@@ -6,7 +6,7 @@ function pca_assemble_covariance_matrix(p,o,s,idx)
 
 
 %% Initialize
-disp([s.nn,'Assembling covariance-matrices...']);
+disp([s.cn,'Assembling covariance-matrices...']);
 
 % Load real-space mask
 mask = read_vol(s,p(idx).rootdir,[o.maskdir,p(idx).mask_name]);
@@ -44,7 +44,7 @@ for i = o.filt_jobs
 
     % Write checkjob
     system(['touch ',p(idx).rootdir,'/',o.commdir,'/sg_pca_covarmat_',num2str(i)]);
-    disp([s.nn,num2str(i),' out of ',num2str(o.n_filt),' covariance matrices assembled!!!']);
+    disp([s.cn,num2str(i),' out of ',num2str(o.n_filt),' covariance matrices assembled!!!']);
 
 end
 

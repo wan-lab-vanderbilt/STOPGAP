@@ -26,4 +26,4 @@ system(['rm -f ',p(idx).rootdir,'/',o.tempdir,'/timer_f_eigenvec*']);
 
 % Write completion file
 system(['touch ',p(idx).rootdir,'/',o.commdir,'/complete_sg_pca_eigenvec']);
-disp([s.nn,'PCA Eigenvector calculation complete!!!']);
+disp([s.cn,'PCA Eigenvector calculation complete!!!']);

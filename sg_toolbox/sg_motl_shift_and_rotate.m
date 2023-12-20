@@ -4,7 +4,7 @@
 % ordered as shift, then rotation about the shifted positions.
 %
 % Best practice would be to pre-determine the desired shifts and rotations
-% using tom_rotate(tom_shift(ref,[x_shift,y_shift,z_shift]),[phi,psi,the]).
+% using sg_rotate_vol(sg_shift_vol(ref,[x_shift,y_shift,z_shift]),[phi,psi,the]).
 % These shifts and rotations are then the input for this script. 
 %
 % WW 08-2018
@@ -12,13 +12,13 @@
 %% Inputs
 
 % Motivelists
-input_name = 'allmotl_10.star';
-output_name = 'allmotl_shift_10.star';
+input_name = 'combined.star';
+output_name = 'combined_shift.star';
 
 % Shifts
-x_shift = 5;
-y_shift = 2;
-z_shift = 7;
+x_shift = 0;
+y_shift = 0;
+z_shift = 1;
 
 % Rotations
 phi = 0;

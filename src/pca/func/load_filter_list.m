@@ -12,7 +12,7 @@ fname = [p(idx).rootdir,'/',o.listdir,'/',p(idx).filtlist_name];
 try
     o.flist = stopgap_star_read(fname,true,[],'stopgap_pca_filt_list');
 catch
-    error([s.nn,'ACHTUNG!!! Error reading filter list: ',fname]);
+    error([s.cn,'ACHTUNG!!! Error reading filter list: ',fname]);
 end
 
 

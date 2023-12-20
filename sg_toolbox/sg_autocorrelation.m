@@ -11,7 +11,7 @@ function acf = sg_autocorrelation(vol,mask)
 %% Calculate autocorrelation
 
 % Apply mask
-if nargin == 1
+if nargin == 2
     vol = vol.*mask;
 end 
 

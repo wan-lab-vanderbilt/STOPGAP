@@ -6,9 +6,16 @@ function o = get_subtomo_boxsize(p,o,s,idx)
 
 %% Get boxsize
 
-% Read subtomo
+% Parse subtomo name
 name = [o.subtomodir,'/',p(idx).subtomo_name,'_',s.subtomo_num(o.allmotl.subtomo_num(1)),s.vol_ext];
-subtomo = read_vol(s,p(idx).rootdir,name);
+
+% Check for local copy
+if o.copy_local
+    copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/','first_subtomo_copied',s.wait_time,name,false);
+end
+    
+% Read subtomo
+subtomo = read_vol(s,o.rootdir,name);
 
 % Determine and store boxsize
 o.boxsize = size(subtomo);

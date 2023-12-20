@@ -35,7 +35,7 @@ o.tile_cen = floor(o.tilesize/2)+1;
 
 
 %% Generate filter
-disp([s.nn,'Caculating bandpass filters...']);
+disp([s.cn,'Caculating bandpass filters...']);
 
 % Calcualte 1D bandpass filter
 radius = ceil(o.tmpl_size/2);

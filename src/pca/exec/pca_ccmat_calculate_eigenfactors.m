@@ -7,7 +7,7 @@ function pca_ccmat_calculate_eigenfactors(p,o,s,idx)
 %% Calculate eigenfactors
 
 for i = o.filt_jobs
-    disp([s.nn,'Calculating Eigenfactors from CC-matrix ',num2str(i),'...']);
+    disp([s.cn,'Calculating Eigenfactors from CC-matrix ',num2str(i),'...']);
     
     
     % Read CC-matrix

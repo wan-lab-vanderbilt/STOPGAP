@@ -7,7 +7,7 @@ function stopgap_final_tm(p,s,o,idx)
 
 
 %% Initialize volumes
-disp([s.nn,'Finalizing template matching for tomo: ',num2str(p(idx).tomo_num),'...']);
+disp([s.cn,'Finalizing template matching for index: ',num2str(idx),'...']);
 
 % Intialize volumes
 s_map = zeros(o.tomo_size,'single');
@@ -22,7 +22,7 @@ end
 
 
 %% Fill volumes
-disp([s.nn,'Compiling final maps...']);
+disp([s.cn,'Compiling final maps...']);
 
 % Initialize counter
 pc = struct();
@@ -54,7 +54,7 @@ for i = 1:o.n_cores
     % Increment completion counter
     [pc,rt_str] = progress_counter(pc,'count',o.n_cores,s.counter_pct);
     if ~isempty(rt_str)
-        disp([s.nn,'Job progress: ',num2str(pc.c),' out of ',num2str(o.n_cores),' tiles summed... ',rt_str]);
+        disp([s.cn,'Job progress: ',num2str(pc.c),' out of ',num2str(o.n_cores),' tiles summed... ',rt_str]);
     end
     
 end
@@ -91,7 +91,7 @@ if sg_check_param(p(idx),'tomo_mask_name')
     
 end
 %% Write outputs and cleanup
-disp([s.nn,'Writing final maps...']);
+disp([s.cn,'Writing final maps...']);
 
 % Generate output names
 s_name = [o.mapdir,p(idx).smap_name,'_',num2str(p(idx).tomo_num),s.vol_ext];
@@ -100,25 +100,30 @@ o_name = [o.mapdir,p(idx).omap_name,'_',num2str(p(idx).tomo_num),s.vol_ext];
 
 % Write output files
 write_vol(s,o,p(idx).rootdir,s_name,s_map);
+disp([s.cn,p(idx).rootdir,s_name,' written!']);
 write_vol(s,o,p(idx).rootdir,o_name,o_map);
+disp([s.cn,p(idx).rootdir,o_name,' written!']);
 
 % Write raw files
 if s.write_raw
     if p(idx).noise_corr
         n_name = [o.rawdir,'noise_',p(idx).smap_name,'_',num2str(p(idx).tomo_num),s.vol_ext];
-        write_vol(s,o,p(idx).rootdir,n_name,n_map);        
+        write_vol(s,o,p(idx).rootdir,n_name,n_map);   
+        disp([s.cn,p(idx).rootdir,n_name,' written!']);
         rs_name = [o.rawdir,'raw_',p(idx).smap_name,'_',num2str(p(idx).tomo_num),s.vol_ext];
         write_vol(s,o,p(idx).rootdir,rs_name,rs_map);
+        disp([s.cn,p(idx).rootdir,rs_name,' written!']);
     end    
 end
 
 if o.n_tmpl > 1
     t_name = [o.mapdir,p(idx).tmap_name,'_',num2str(p(idx).tomo_num),s.vol_ext];
     write_vol(s,o,p(idx).rootdir,t_name,t_map);
+    disp([s.cn,p(idx).rootdir,t_name,' written!']);
 end
 
 
-disp([s.nn,'Template matching for tomo: ',num2str(p(idx).tomo_num),' complete!!!!1!!11!']);
+disp([s.cn,'Template matching for index ',num2str(idx),' complete!!!!1!!11!']);
 
 
 

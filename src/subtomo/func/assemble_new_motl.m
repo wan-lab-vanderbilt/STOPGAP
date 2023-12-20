@@ -5,7 +5,7 @@ function assemble_new_motl(p,o,s,idx)
 % WW 06-2019
 
 %% Initialize
-disp([s.nn,'Assembling new motivelist...']);
+disp([s.cn,'Assembling new motivelist...']);
 
 % Check for subset processing
 subset = false;
@@ -15,15 +15,15 @@ if sg_check_param(p(idx),'subset')
     end
 end
 
-% Calculate parameters
-if subset        
-    % Calculate job parameters
-    [~, ~,job_array] = job_start_end(o.n_rand_motls, o.n_cores, o.procnum);
-else
-    % Calculate job parameters
-    [~, ~,job_array] = job_start_end(o.n_motls, o.n_cores, o.procnum);
-
-end
+% % Calculate parameters
+% if subset        
+%     % Calculate job parameters
+%     [~, ~,job_array] = job_start_end(o.n_rand_motls, o.n_cores, o.procnum);
+% else
+%     % Calculate job parameters
+%     [~, ~,job_array] = job_start_end(o.n_motls, o.n_cores, o.procnum);
+% 
+% end
 
 % Size of motl
 switch o.motl_type
@@ -51,11 +51,10 @@ for i = 1:o.n_cores
     % Parse name
     motl_name = [o.tempdir,'/splitmotl_',num2str(i),'.star'];
     
-    % Size of split motl
-    smotl_size = (job_array(i,1)*m);
+%     % Size of split motl
+%     smotl_size = (job_array(i,1)*m);
     
-    % Field indices
-    e_idx = s_idx + smotl_size - 1;
+    
     
     % Try to read
     t = 0; % Number of tries
@@ -64,21 +63,27 @@ for i = 1:o.n_cores
             % Read motl
             splitmotl = sg_motl_read2([p(idx).rootdir,'/',motl_name],true);
             
-            % Fill fields
-            for j = 1:n_fields
-                motl.(motl_fields{j,1})(s_idx:e_idx) = splitmotl.(motl_fields{j,1});
-            end
-            
             break
             
         catch
-            warning([s.nn,'Failure reading ',motl_name,' on try ',num2str(t)]);
+            warning([s.cn,'Failure reading ',motl_name,' on try ',num2str(t)]);
             t = t+1;
         end
         if t >= s.n_tries
-            error([s.nn,'Failure reading ',motl_name]);
+            error([s.cn,'Failure reading ',motl_name]);
         end
     end
+    
+        % Determine size of splitmotl
+        smotl_size = numel(unique(splitmotl.motl_idx));
+
+        % Field indices
+        e_idx = s_idx + smotl_size - 1;
+
+        % Fill fields
+        for j = 1:n_fields
+            motl.(motl_fields{j,1})(s_idx:e_idx) = splitmotl.(motl_fields{j,1});
+        end
     
 
     % Increment counter
@@ -96,15 +101,22 @@ if subset
         motl.(motl_fields{j,1})(s_idx:end) = o.allmotl.(motl_fields{j,1})(unali_idx);
     end
 end
+
+% Check for duplicates
+[~,unique_idx,~] = unique(motl.motl_idx);
+motl = sg_motl_parse_type2(motl,unique_idx);
     
     
 
 %% Write ouptut
 
+% Normalize Euler angles
+motl = sg_motl_normalize_euler_angles(motl);
+
 % Write new motl
 sg_motl_write2([p(idx).rootdir,'/',o.listdir,'/',p(idx).motl_name,'_',num2str(p(idx).iteration+1),'.star'],motl);
 
-disp([s.nn,'New motivelist assembled!!!']);
+disp([s.cn,'New motivelist assembled!!!']);
 
 
 

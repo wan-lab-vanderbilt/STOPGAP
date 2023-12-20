@@ -29,7 +29,7 @@ o = read_random_seed(p,o,s,idx);
 
 
 %% Randomize phases for each map
-disp([s.nn,'Initialize parameters for phase-randomization...']);
+disp([s.cn,'Initialize parameters for phase-randomization...']);
 
 
 % Find pass-through indices
@@ -40,7 +40,7 @@ o.n_pt_pix = numel(o.pt_idx);
 o.pr_tmpl = cell(o.n_tmpl,1);
 
 % Calculate phase-randomized volues
-disp([s.nn,'Generating phase-randomized volumes...']);
+disp([s.cn,'Generating phase-randomized volumes...']);
 for i = 1:o.n_tmpl
     
     % Split amplitudes and phases

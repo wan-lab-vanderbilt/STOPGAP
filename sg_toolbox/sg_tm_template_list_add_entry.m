@@ -13,12 +13,12 @@
 %% Inputs
 
 % Template list name
-tlist_name = 'tlist_pdb_20deg.star';
+tlist_name = 'tlist_20deg.star';
 
 % Parameters
-tmpl_name = 'pdb_template.mrc';
-mask_name = 'pdb_body_mask.mrc';
-symmetry = 'c1';
+tmpl_name = 'tmpl.mrc';
+mask_name = 'cyl_mask2.mrc';
+symmetry = 'c6';
 anglist_name = 'anglist_20deg_c1.csv';
 
 

@@ -10,7 +10,7 @@ function motl = sg_motl_read2(motl_name,no_header)
 % intuitive, this is required to save MATLAB overhead space, which is
 % unwieldy large for large datasets.
 %
-% WW 05-2019
+% WW 03-2021
 
 %% Check check
 
@@ -49,15 +49,15 @@ else
     
     
     % Find start and end of stopgap_motivelist field
-    data_idx = find(strncmp('data_',star{1},5));
-    motl_start_idx = find(strncmp('data_stopgap_motivelist',star{1},23));
-    motl_end_idx = find(data_idx>motl_start_idx(1))-1;
+    data_idx = find(strncmp('data_',star{1},5));                                % Find the first data field
+    motl_start_idx = find(strncmp('data_stopgap_motivelist',star{1},23));       % Find where the motivelist data starts
+    motl_end_idx = find(data_idx>motl_start_idx(1),1)-1;
     if isempty(motl_end_idx)
         motl_end_idx = n_lines;
     end
 
     % Find fields in file
-    field_idx = find(strncmp('_',star{1},1));
+    field_idx = find(strncmp('_',star{1},1));   % Fields start with '_'
     n_fields = numel(field_idx);
 
     % Check fields against defined fields
@@ -66,13 +66,13 @@ else
     fields = cell(n_fields,1);          % Fields in input list
     field_order = zeros(n_fields,1);    % Order if input fields
     for i = 1:n_fields
-        fields{i} = star{1}{field_idx(i)}(2:end);
-        check_idx = strcmp(fields{i},def_fields(:,1));
+        fields{i} = star{1}{field_idx(i)}(2:end);           % Parse field
+        check_idx = strcmp(fields{i},def_fields(:,1));      % Get index in the defined field list
         if ~any(check_idx)
             error(['ACHTUNG!!! Unsupported motivelist field: ',star{1}{field_idx(i)},'!!!']);
         else
-            used_fields(check_idx) = true;
-            field_order(check_idx) = i;
+            used_fields(check_idx) = true;  % In the defined order
+            field_order(check_idx) = i;     % Maps file order to defined order
         end
     end
 
@@ -110,36 +110,51 @@ fmt = [fmt_cell{:}];
 % Motivelist entry indices
 motl_idx = cellfun(@(x) ~isempty(x), star{1}(field_idx(end)+1:motl_end_idx));
 n_motls = sum(motl_idx);
-data_cell = cell(n_fields,n_motls);
-c = 1;
+
+% Initialze motivelist
+motl = sg_initialize_motl2(n_motls);
+
+% Parse through star cell
+c = 1;  % Counter for index in motl struct
 for i = 1:numel(motl_idx)
+    
+    % Check for empty line
     if motl_idx(i)
-        data_cell(:,c) = textscan(star{1}{i+field_idx(end)},fmt);
+
+        % Parse line into temporary cell
+        temp_cell = textscan(star{1}{i+field_idx(end)},fmt);
+        
+        % Fill motl
+        for j = 1:n_fields
+            
+            % No Header
+            if no_header
+                
+                switch def_fields{field_order(j),3}
+                    case 'str'
+                        motl.(def_fields{j,1}){c} = temp_cell{j};
+                    otherwise
+                        motl.(def_fields{j,1})(c) = temp_cell{j};
+                end
+                
+            else
+                
+                switch def_fields{field_order(j),3}
+                    case 'str'
+                        motl.(fields{field_order(j)}){c} = temp_cell{j};
+                    otherwise
+                        motl.(fields{field_order(j)})(c) = temp_cell{j};
+                end
+            end
+            
+        end
+        
+        % Increment counter
         c = c+1;
+        
     end
 end
 clear star
-
-
-%% Generate struct array
-
-% Sorted fields
-[~,sort_idx] = sort(field_order);
-
-% Intialize struct
-motl = struct();
-
-% Fill fields
-for i = 1:n_fields
-    switch def_fields{field_order(i),2}
-        case 'str'
-            motl.(def_fields{field_order(i),1}) = data_cell(sort_idx(i),:)';
-        otherwise
-            motl.(def_fields{field_order(i),1}) = [data_cell{sort_idx(i),:}]';
-    end
-end
-
-clear data_cell
 
 end
 

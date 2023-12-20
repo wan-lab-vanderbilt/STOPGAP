@@ -10,10 +10,13 @@ function folders = stopgap_source_folders()
 f = struct();
 
 % Add general directories
-f.io = {'stopgap/','io/','func/','extract/'};
+f.io = {'stopgap/','io/','func/'};
 
 % Subtomogram alignment/averaging directories
 f.subtomo = {'subtomo/parser/','subtomo/watcher/','subtomo/exec/','subtomo/func/'};
+
+% Subtomogram extraction directories
+f.extract = {'extract/parser/','extract/watcher/','extract/exec/','extract/func/'};
 
 % Tempalte matching
 f.temp_match = {'tm/parser/','tm/watcher/','tm/exec/','tm/func/'};

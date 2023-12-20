@@ -16,6 +16,8 @@ switch ext
         vol = sg_mrcread(filename);
     case {'.em'}
         vol = sg_emread(filename);
+    otherwise
+        error('ACHTUNG!!! Unknown input format!!!');
 end
 
 

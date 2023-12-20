@@ -6,7 +6,7 @@ function pairs = intialize_pairlist(o,s)
 % WW 06-2019
 
 %% Initialize pairs
-disp([s.nn,'Initializing pair lists...']);
+disp([s.cn,'Initializing pair lists...']);
 
 % Calculate pairlist
 pairlist = sg_pca_determine_unique_pairs(o.n_subtomos);

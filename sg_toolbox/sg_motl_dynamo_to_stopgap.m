@@ -18,34 +18,59 @@ if nargin < 2
     output_name = [path,name,'.star'];
 end
 
-%% Convert!!!
 
-% Read table
+
+%% Convert
+
+% Read dynamo table
 table = real(dlmread(input_name));
 n_motls = size(table,1);
 
-% Initialize table
-motl = sg_initialize_motl(n_motls);
+% Get motl fields 
+motl_fields = sg_get_motl_fields;
+n_fields = size(motl_fields,1);
 
-% Fill table with motivelist parameters
-motl = sg_motl_fill_field(motl,'subtomo_num',table(:,1));
-motl = sg_motl_fill_field(motl,'halfset','A');
-motl = sg_motl_fill_field(motl,'x_shift',table(:,4));
-motl = sg_motl_fill_field(motl,'y_shift',table(:,5));
-motl = sg_motl_fill_field(motl,'z_shift',table(:,6));
-motl = sg_motl_fill_field(motl,'phi',-table(:,9));
-motl = sg_motl_fill_field(motl,'psi',-table(:,7));
-motl = sg_motl_fill_field(motl,'the',-table(:,8));
-motl = sg_motl_fill_field(motl,'score',table(:,10));
-motl = sg_motl_fill_field(motl,'tomo_num',table(:,20));
-motl = sg_motl_fill_field(motl,'object',table(:,21));
-motl = sg_motl_fill_field(motl,'class',table(:,22));
-motl = sg_motl_fill_field(motl,'orig_x',table(:,24));
-motl = sg_motl_fill_field(motl,'orig_y',table(:,25));
-motl = sg_motl_fill_field(motl,'orig_z',table(:,26));
+
+% dynamo table indices
+table_row = {'motl_idx',        1;...
+             'tomo_num',        20;...
+             'object',          21;...
+             'subtomo_num',     1;...
+             'halfset',         [];...
+             'orig_x',          24;...
+             'orig_y',          25;...
+             'orig_z',          26;...
+             'score',           10;...
+             'x_shift',         4;...
+             'y_shift',         5;...
+             'z_shift',         6;...
+             'phi',             9;...
+             'psi',             7;...
+             'the',             8;...
+             'class',           22;...
+             };
+
+% Initalize struct array
+motl = struct();
+
+% Fill fields
+for i = 1:n_fields
+    switch motl_fields{i,3}
+        case 'int'
+            motl.(motl_fields{i,1}) = int32(table(:,table_row{i,2}));
+        case 'float'
+            motl.(motl_fields{i,1}) = single(table(:,table_row{i,2}));
+        case 'str'
+            motl.(motl_fields{i,1}) = repmat({'A'},n_motls,1);
+    end
+end
+
+% Invert eulers
+motl.phi = -motl.phi;
+motl.psi = -motl.psi;
+motl.the = -motl.the;
 
 % Write output
-sg_motl_write(output_name,motl);
-
+sg_motl_write2(output_name,motl);
 
 

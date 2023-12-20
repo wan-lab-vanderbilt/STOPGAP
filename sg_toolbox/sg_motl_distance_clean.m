@@ -8,14 +8,14 @@
 %% Inputs
 
 % Motivelist names
-input_motl = 'allmotl_pdb_1.star';
-output_motl = 'allmotl_pdb_dclean4_1.star';
+input_motl = 'allmotl_9.star';
+output_motl = 'allmotl_dclean48_9.star';
 
 % Distance cutoff (pixels)
-d_cut = 4;
+d_cut = 48;
 
 % Score cutoff
-s_cut = 0.4;
+s_cut = 0;
 
 
 %% Intialize
@@ -48,7 +48,7 @@ for i = 1:n_tomos
     temp_scores = allmotl.score(tomo_idx);
     
     % Sort scores
-    [~,sort_idx] = sort(temp_scores);
+    [~,sort_idx] = sort(temp_scores,'descend');
             
     % Temporary keep index
     temp_keep = true(n_temp_motl,1);

@@ -16,7 +16,7 @@ if nargin == 3
     iteration = 'none';    
     subtomo_mode = 'none';
 elseif nargin ~= 6
-    error([s.nn,'ACHTUNG!!! Incorrect number of inputs!!!']);
+    error([s.cn,'ACHTUNG!!! Incorrect number of inputs!!!']);
 end
    
 
@@ -28,10 +28,10 @@ if exist([rootdir,'/',paramfilename],'file')
     try
         p = sg_read_subtomo_param(rootdir,paramfilename);
     catch
-        error([s.nn,'Achtung!!!! Error reading parameter file: ',paramfilename]);
+        error([s.cn,'Achtung!!!! Error reading parameter file: ',paramfilename]);
     end
 else
-    error([s.nn,'Achtung!!! ',paramfilename,' does not exist!!!']);
+    error([s.cn,'Achtung!!! ',paramfilename,' does not exist!!!']);
 end
 
 
@@ -51,9 +51,9 @@ if ~strcmp(iteration,'none') && ~strcmp(subtomo_mode,'none')
 
     % Check for proper match
     if isempty(idx)
-        error([s.nn,'ACHTUNG!!! No matching job found!!!']);
+        error([s.cn,'ACHTUNG!!! No matching job found!!!']);
     elseif numel(idx)>1
-        warning([s.nn,'ACHTUNG!!! Too many matches!!! Updating first match in index ',num2str(idx(1)),'!!!']);        
+        warning([s.cn,'ACHTUNG!!! Too many matches!!! Updating first match in index ',num2str(idx(1)),'!!!']);        
         idx = idx(1);
     end            
     

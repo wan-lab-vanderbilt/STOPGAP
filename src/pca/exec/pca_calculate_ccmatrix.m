@@ -81,7 +81,7 @@ for i = 1:n_pairs
     % Increment completion counter
     [pc,rt_str] = progress_counter(pc,'count',n_pairs,s.counter_pct);
     if ~isempty(rt_str)
-        disp([s.nn,'Job progress: ',num2str(pc.c),' out of ',num2str(n_pairs),' correlated... ',rt_str]);
+        disp([s.cn,'Job progress: ',num2str(pc.c),' out of ',num2str(n_pairs),' correlated... ',rt_str]);
     end
     
 end

@@ -1,4 +1,4 @@
-function [positions,eulers] = sg_motl_generate_tube_function(points,l_step,c_step,radius)
+function motl = sg_motl_generate_tube_function(points,l_dist,c_dist,radius,helical_step)
 %% sg_motl_generate_tube_function
 % A function for generating a tubular grid with initial euler angles from a
 % set of points along the tube axis. 
@@ -6,6 +6,11 @@ function [positions,eulers] = sg_motl_generate_tube_function(points,l_step,c_ste
 % WW 06-2018
 
 
+%% Check check
+
+if isempty(helical_step)
+    helical_step = 0;
+end
 
 %% Generating spline fit of filament
 n_points = size(points,2);
@@ -21,7 +26,7 @@ for i = 2:n_points
 end
 
 % Number of steps along spline
-frac_dist = ceil(total_dist/l_step);  
+frac_dist = ceil(total_dist/l_dist);  
 
 % Steps as fraction of input points
 steps = 1:((n_points-1)/frac_dist):n_points;
@@ -35,7 +40,7 @@ n_spline = size(Ft,2);
 %% Generating ring
 
 % Determine integral number of points around circumference of tube
-n_ang_steps = floor((2*pi*radius)/c_step);
+n_ang_steps = floor((2*pi*radius)/c_dist);
 if mod(n_ang_steps,2)
     n_ang_steps = n_ang_steps + 1;    % Make sure steps are even... no reason, just OCD
 end
@@ -46,9 +51,9 @@ angle = (2*pi)/n_ang_steps;
 
 % Calcualte circle points
 circ_theta = 0:angle:((2*pi)-angle);
-[cx,cy] = pol2cart(circ_theta,repmat(radius,[1,n_ang_steps]));
-circle = cat(1,cx,cy);
-n_circ_steps = size(circle,2);
+% [cx,cy] = pol2cart(circ_theta,repmat(radius,[1,n_ang_steps]));
+% circle = cat(1,cx,cy);
+n_circ_steps = numel(circ_theta);
 
 
 
@@ -58,6 +63,8 @@ n_circ_steps = size(circle,2);
 n_pos = n_spline*n_circ_steps;
 positions = zeros(3,n_pos);
 eulers = zeros(3,n_pos);
+
+helical_rot = 0;
 
 for i = 1:n_spline  % For each pair of points on the spline
     
@@ -80,6 +87,10 @@ for i = 1:n_spline  % For each pair of points on the spline
     
     % Set origin to first point
     origin=repmat([Ft(1,i);Ft(2,i);Ft(3,i)],[1,n_circ_steps]);
+    
+    % Apply helical rotation
+    [cx,cy] = pol2cart(circ_theta+helical_rot,repmat(radius,[1,n_ang_steps]));
+    circle = cat(1,cx,cy);
     
     % Generate 3D circle points
     pos = cat(1,circle,zeros(1,n_circ_steps));
@@ -116,5 +127,32 @@ for i = 1:n_spline  % For each pair of points on the spline
         eulers(1,idx) = atan2d(vec(2),vec(1));
     end
     
-
+    helical_rot = helical_rot + helical_step;
 end
+
+
+%% Generate motivelist
+
+
+% Initialize motl
+motl = sg_initialize_motl2(n_pos);
+
+% Store eulers
+motl.phi = single(eulers(1,:))';
+motl.psi = single(eulers(2,:))';
+motl.the = single(eulers(3,:))';
+
+% Calculate positions and shifts
+r_pos = round(positions);
+shifts = positions - r_pos;
+
+% Store coordinates
+motl.orig_x = single(r_pos(1,:)');
+motl.orig_y = single(r_pos(2,:)');
+motl.orig_z = single(r_pos(3,:)');
+motl.x_shift = single(shifts(1,:)');
+motl.y_shift = single(shifts(2,:)');
+motl.z_shift = single(shifts(3,:)');
+
+
+

@@ -81,12 +81,12 @@ o.q_ang = cell(o.n_ang,1);
 for i = 1:o.n_ang
 
     % Convert single rotations to quaternions
-    q1 = axisangle2quaternion(a.(axes{1}),ang_perm(1,i));
-    q2 = axisangle2quaternion(a.(axes{2}),ang_perm(2,i));
-    q3 = axisangle2quaternion(a.(axes{3}),ang_perm(3,i));
+    q1 = sg_axisangle2quaternion(a.(axes{1}),ang_perm(1,i));
+    q2 = sg_axisangle2quaternion(a.(axes{2}),ang_perm(2,i));
+    q3 = sg_axisangle2quaternion(a.(axes{3}),ang_perm(3,i));
     
     % Combine rotations
-    q = quaternion_multiply(q3,q2,q1);
+    q = sg_quaternion_multiply(q3,q2,q1);
     
     % Store quaternion
     o.q_ang{i} = q;    

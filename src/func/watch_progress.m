@@ -1,4 +1,4 @@
-function watch_progress(p,o,s,idx,prog_name,total_size,divide,msg,window_size)
+function watch_progress(p,o,s,idx,prog_name,total_size,divide,msg,window_size,time_job)
 %% watch_progress
 % Watch progress files as they're being written. 
 %
@@ -9,6 +9,20 @@ function watch_progress(p,o,s,idx,prog_name,total_size,divide,msg,window_size)
 % number of cores.
 %
 % WW 06-2019
+
+%% Check check
+
+if nargin == 9
+    time_job = true;
+end
+
+if ~time_job
+    time_str = '';
+end
+
+% Initialize crash log array
+crash_log = false(o.n_cores,1);
+
 
 %% Watch it!
 
@@ -21,9 +35,10 @@ n_back = 0;     % Number of lines in status
 pname = [p(idx).rootdir,'/',o.commdir,'/',prog_name,'_*'];
 
 % Initialize timer
-timer = struct();
-timer = rolling_window_timer(timer,'init',window_size);
-
+if time_job
+    timer = struct();
+    timer = rolling_window_timer(timer,'init',window_size);
+end
 
 % Wait until align completion
 while n_done < total_size
@@ -42,10 +57,11 @@ while n_done < total_size
         end
 
         % Time estimation
-        timer = rolling_window_timer(timer,'time',[],total_size,n_done);
-        rt_str = [num2str(timer.rt,2),' ',timer.units];
-        time_str = ['Estimated time remaining: ',rt_str];
-
+        if time_job
+            timer = rolling_window_timer(timer,'time',[],total_size,n_done);
+            rt_str = [num2str(timer.rt,2),' ',timer.units];
+            time_str = ['Estimated time remaining: ',rt_str];
+        end
     else
         
         % Empty outputs
@@ -55,8 +71,11 @@ while n_done < total_size
     end 
     
     % Print job status
-    status = [s.nn,num2str(n_done),' out of ',num2str(total_size),' ',msg,' ',time_str];
+    status = [s.cn,num2str(n_done),' out of ',num2str(total_size),' ',msg,' ',time_str];
     n_back = print_status(status, n_back);
+    
+    % Check for crashes
+    crash_log = check_crashes(p,idx,crash_log);
 
 end
 

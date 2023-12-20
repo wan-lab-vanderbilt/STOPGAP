@@ -2,7 +2,7 @@ function sym_vol = sg_symmetrize_volume(vol,symmetry,init_euler,center,reweight,
 %% sg_symmetrize_volume
 % Apply point group symmetry operator to a volume. Operators follow
 % Schoenflies notation. Standard orientations of symmetry operators are
-% described elsewhere (doi: 1016/j.jsb.2005.06.001). 
+% described elsewhere (doi: 10.1016/j.jsb.2005.06.001). 
 %
 % Symmetry types allowed include:
 % C[n]    -    n-fold cylic symmetry (i.e. C2 is 2-fold cyclic)

@@ -5,7 +5,7 @@ function pca_covar_calculate_svd(p,o,s)
 % WW 06-2019
 
 %% Initialize
-disp([s.nn,'Preparing to perform SVDs...']);
+disp([s.cn,'Preparing to perform SVDs...']);
 
 % Load real-space mask
 mask = read_vol(s,p.rootdir,[o.maskdir,p.mask_name]);
@@ -15,7 +15,7 @@ clear mask
 %% Calculate eigenvectors
 
 for i = o.filt_jobs
-    disp([s.nn,'Perofrming SVD on covariance-matrix ',num2str(i),'...']);
+    disp([s.cn,'Perofrming SVD on covariance-matrix ',num2str(i),'...']);
     
     
     % Read covariance matrix
@@ -30,7 +30,7 @@ for i = o.filt_jobs
     end
     
     % Write eigenvectors
-    disp([s.nn,'SVD complete!!! Writing eigenvectors...']);
+    disp([s.cn,'SVD complete!!! Writing eigenvectors...']);
     for j = 1:p.n_eigs
         
         % Initialize eigenvector
@@ -53,7 +53,7 @@ for i = o.filt_jobs
     system(['touch ',p.rootdir,'/',o.commdir,'/sg_pca_svd_',num2str(i)]);
     
 end
-disp([s.nn,'All eigenvectors written!!!']);
+disp([s.cn,'All eigenvectors written!!!']);
 
 
 

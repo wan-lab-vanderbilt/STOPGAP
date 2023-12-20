@@ -12,14 +12,14 @@ seed_name = ['rseed_',num2str(o.seed_idx)];
 
 
 if (o.procnum == 1) && ~exist([seed_path,seed_name],'file')
-    disp([s.nn,'Generating random seed for iteration ',num2str(o.seed_idx),'!!!']);
+    disp([s.cn,'Generating random seed for iteration ',num2str(o.seed_idx),'!!!']);
     
     % Generate seed
     rng('shuffle');
     o.rseed = round(rand(1)*(2^32));
     
     % Write seed    
-    fid =fopen([seed_path,seed_name,'_temp'],'w');
+    fid = fopen([seed_path,seed_name,'_temp'],'w');
     fprintf(fid,'%s',num2str(o.rseed));
     fclose(fid);
     movefile([seed_path,seed_name,'_temp'],[seed_path,seed_name]);

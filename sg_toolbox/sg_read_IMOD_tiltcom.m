@@ -1,5 +1,4 @@
 function tiltcom  = sg_read_IMOD_tiltcom(tiltcom_name)
-
 %% sg_read_IMOD_tiltcom
 % A function to take the path to an IMOD tilt.com file, and parse out the
 % inputs in the tilt.com. Parameterts are returned in a struct array.

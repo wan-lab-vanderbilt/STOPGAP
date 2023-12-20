@@ -12,13 +12,13 @@ switch s.vol_ext
         try
             vol = sg_emread([rootdir,'/',filename]);
         catch
-            error([s.nn,'ACHTUNG!!! Error reading file ',filename,'!!!']);
+            error([s.cn,'ACHTUNG!!! Error reading file ',filename,'!!!']);
         end                
     case {'.mrc','.rec','.st','ali'}
         try
             vol = sg_mrcread([rootdir,'/',filename]);
         catch
-            error([s.nn,'ACHTUNG!!! Error reading file ',filename,'!!!']);
+            error([s.cn,'ACHTUNG!!! Error reading file ',filename,'!!!']);
         end  
         
 end

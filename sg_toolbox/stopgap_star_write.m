@@ -63,7 +63,8 @@ for i = 1:n_fields
         if all(cellfun(@(x) floor(x)==x, {struct_array.(fields{i})}))
 
             % Largest number of digits
-            md = max(cellfun(@(x) floor(log10(abs(x)+1))+1,{struct_array.(fields{i})}));
+%             md = max(cellfun(@(x) floor(log10(abs(x)+1))+1,{struct_array.(fields{i})}));
+            md = max(cellfun(@(x) floor(log10(abs(double(x))+1))+1,{struct_array.(fields{i})}));
             f_types{i} = ['% ',num2str(md+1),'i'];
 
         else

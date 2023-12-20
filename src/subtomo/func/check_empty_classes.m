@@ -14,7 +14,7 @@ n_empty = numel(d);
 
 % Emtpy classes
 if n_empty > 0
-    warning([s.nn,'ACHTUNG!!! ',num2str(n_empty),' classes emptied during iteration ',num2str(p(idx).iteration),'...']);
+    warning([s.cn,'ACHTUNG!!! ',num2str(n_empty),' classes emptied during iteration ',num2str(p(idx).iteration),'...']);
     
     % Parse empty class numbers
     empty_classes = zeros(n_empty,1);
@@ -42,7 +42,7 @@ if n_empty > 0
     % Write new motl
     sg_motl_write2([p(idx).rootdir,'/',o.listdir,'/',p(idx).motl_name,'_',num2str(p(idx).iteration+1),'.star'],o.allmotl);
 
-    disp([s.nn,'Revised motivelist written!!!']);
+    disp([s.cn,'Revised motivelist written!!!']);
     
 end
 
