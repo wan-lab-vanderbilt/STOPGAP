@@ -4,15 +4,17 @@
 # proper parallelization variables. This is either when
 # using mpirun or srun with slurm.
 #
-# WW 12-2023
+# WW 01-2024
 
 
 # Bash parameters
-# set -e              # Crash on error
 set -o nounset      # Crash on unset variables
 
-# Load MATLAB module if necessary
-# module load MATLAB/2020b
+# Load MATLAB module
+module load MATLAB/2020b    # Remove or update as necessary
+
+# Set root of local temporary folder
+LOCAL_TEMP_ROOT=/tmp/
 
 # Parse input arguments
 args=("$@")
@@ -23,7 +25,7 @@ copy_local=${args[3]}
 run_type=${args[4]}
 
 
-# Source libraries
+# Source libraries. There are two config files in case your local and SLURM configurations have different methods for sourcing libraries. 
 if [ "${run_type}" = "local" ]; then
     echo "Sourcing libraries for local run..."
     source $STOPGAPHOME/lib/stopgap_config_local.sh 
@@ -41,6 +43,7 @@ slurm_test=${SLURM_PROCID:-}
 if [[ ${mpi_test} ]]; then
     # For mpirun
     procnum=$OMPI_COMM_WORLD_RANK       # Get rank number
+    local_id=$OMPI_COMM_WORLD_RANK
     node_name=$HOSTNAME
     run_type="MPI"
 
@@ -55,7 +58,6 @@ elif [[ ${slurm_test} ]]; then
     cpus_on_node=${SLURM_CPUS_ON_NODE}  # CPUs assigned to current node
     run_type="SLURM"
     node_id=$((node_id+1))              # Start node ID at one
-    local_id=$((local_id+1))            # Start local ID at one
 
 else
     echo "ACHTUNG!!! Could not obtain rank from Slurm or MPI variables!!!"
@@ -63,7 +65,7 @@ else
 fi
 # Set ID numbers to start at 1
 procnum=$((procnum+1))              # Start rank number at one
-
+local_id=$((local_id+1))            # Start local ID at one
 
 
 # Go to root directory
@@ -71,9 +73,27 @@ cd $rootdir
 
 
 # Set MCR directory
-source $STOPGAPHOME/lib/stopgap_prepare_mcr.sh 
+source $STOPGAPHOME/lib/stopgap_prepare_mcr.sh ${LOCAL_TEMP_ROOT}
 
+# Set local temporary directory
+if [ $copy_local -gt 0 ]; then
 
+    export LOCAL_TEMP="$LOCAL_TEMP_ROOT/stopgap_u${UID}/" 
+
+    if [ $local_id = 1 ]; then
+        
+        if [ $copy_local = 1 ]; then
+            echo "Using local temporary storage..."
+            source $STOPGAPHOME/lib/stopgap_prepare_local_temp.sh $LOCAL_TEMP
+        elif [ $copy_local -ge 2 ]; then
+            echo "Using persistent local storage..."                                 
+            mkdir $LOCAL_TEMP
+        fi
+
+    else
+        echo "Using temporary local storage..."
+    fi
+fi
 
 # Run STOPGAP
 if [ $run_type = "MPI" ]; then
@@ -82,28 +102,7 @@ if [ $run_type = "MPI" ]; then
         $STOPGAPHOME/lib/stopgap rootdir ${rootdir} paramfilename ${paramfilename} procnum ${procnum} n_cores ${n_cores} user_id ${UID} node_name ${node_name} n_nodes 1 local_id ${procnum} copy_local ${copy_local}
 
 elif [ $run_type = "SLURM" ]; then
-    echo "Running using ${run_type}... procnum: $procnum - hostname: $node_name - node_id: $SLURM_NODEID local_id: $SLURM_LOCALID - CPUs on Node: $SLURM_CPUS_ON_NODE"
-    
-    # Set local temporary directory
-    if [ $copy_local -gt 0 ]; then
-        if [ $local_id = 1 ]; then
-            
-            if [ $copy_local = 1 ]; then
-                echo "Using local temporary storage..."
-                source $STOPGAPHOME/lib/stopgap_prepare_local_temp.sh 
-            elif [ $copy_local -ge 2 ]; then
-                echo "Using persistent local storage..."
-                mkdir "/tmp/stopgap_u${UID}/" 
-                export LOCAL_TEMP="/tmp/stopgap_u${UID}/"                  
-            fi
-
-        else
-            echo "Using temporary local storage..."
-            export LOCAL_TEMP="/tmp/stopgap_u${UID}/"   
-        fi
-    fi
-
-
+    echo "Running using ${run_type}... procnum: $procnum - hostname: $node_name - node_id: $SLURM_NODEID local_id: $SLURM_LOCALID - CPUs on Node: $SLURM_CPUS_ON_NODE"    
     $STOPGAPHOME/lib/stopgap rootdir ${rootdir} paramfilename ${paramfilename} procnum ${procnum} n_cores ${n_cores} user_id ${UID} job_id ${job_id} node_name ${node_name} node_id ${node_id} n_nodes ${n_nodes} cpus_on_node ${cpus_on_node} local_id ${local_id} copy_local ${copy_local}
 
 fi

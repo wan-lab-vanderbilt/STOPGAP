@@ -11,6 +11,9 @@ function subtomo_parser(varargin)
 %
 % WW 06-2019
 
+% % % % % DEBUG
+% varargin = {'param_name', 'new_param.star', 'rootdir', '/fs/gpfs06/lv03/fileset01/pool/pool-plitzko/will_wan/empiar_10064/tm/all', 'tempdir', 'none', 'commdir', 'none', 'rawdir', 'none', 'refdir', 'none', 'maskdir', 'none', 'listdir', 'none', 'fscdir', 'none', 'subtomodir', 'none', 'subtomo_mode', 'ali_multiclass', 'startidx', '8', 'iterations', '1', 'motl_name', 'allmotl_dclean01_kmeans', 'wedgelist_name', 'wedgelist.star', 'binning', '4', 'ref_name', 'reflist.star', 'subtomo_name', 'subtomo', 'ccmask_name', 'ccmask.mrc', 'ali_reffilter_name', 'none', 'ali_particlefilter_name', 'none', 'avg_reffilter_name', 'none', 'avg_particlefilter_name', 'none', 'reffiltertype', 'none', 'particlefiltertype', 'none', 'ps_name', 'none', 'amp_name', 'none', 'specmask_name', 'none', 'search_mode', 'hc', 'search_type', 'cone', 'euler_axes', 'zxy', 'euler_1_incr', '1', 'euler_1_iter', '1', 'euler_2_incr', '1', 'euler_2_iter', '3', 'euler_3_incr', '1', 'euler_3_iter', '1', 'angincr', '2', 'angiter', '3', 'phi_angincr', '2', 'phi_angiter', '3', 'cone_search_type', 'coarse', 'scoring_fcn', 'laplacian_flcf', 'lp_rad', '25', 'lp_sigma', '3', 'hp_rad', '1', 'hp_sigma', '2', 'calc_exp', '1', 'calc_ctf', '1', 'cos_weight', '0', 'score_weight', '0.01', 'symmetry', 'C1', 'score_thresh', '0', 'subset', '100', 'avg_mode', 'partial', 'rot_mode', 'linear', 'fthresh', '300'};
+
 %% Generate input parser
 
 % Parameter types

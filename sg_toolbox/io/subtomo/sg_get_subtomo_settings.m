@@ -19,7 +19,8 @@ default_settings = {'wait_time', 5;...
                     'subtomodir', 'subtomograms/';...
                     'metadir', 'meta';...
                     'specdir', 'spec/';...
-                    'localtempdir','/tmp/';...
+                    'localtempdir',strtrim(get_environmental_variable('$LOCAL_TEMP'));...
+                    'copy_function','tar';...
                     'subtomo_digits', 1;...
                     'vol_ext', '.mrc';...
                     'packets_per_core',5;...
@@ -42,15 +43,21 @@ end
       
 %% Check for overrides
 
-if exist([rootdir,'/',override_name],'file')
     
-    % Read overrides
-    overrides = read_settings_override(rootdir,override_name);
+% Read overrides
+overrides = read_settings_override(rootdir,override_name);
+    
+if ~isempty(overrides)
     
     % Appy overrides
     for i = 1:size(overrides,1)
-        % Check type
+        % Check if setting is present for this task
         idx = strcmp(default_settings(:,1),overrides{i,1});
+        if ~any(idx)
+            continue
+        end
+        
+        % Check type
         if isnumeric(default_settings{idx,2})
             parameter = str2double(overrides{i,2});
         elseif islogical(default_settings{idx,2})

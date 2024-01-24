@@ -11,7 +11,7 @@ name = [o.subtomodir,'/',p(idx).subtomo_name,'_',s.subtomo_num(o.allmotl.subtomo
 
 % Check for local copy
 if o.copy_local
-    copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/','first_subtomo_copied',s.wait_time,name,false);
+    copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/','first_subtomo_copied',s.wait_time,name,false,s.copy_function);
 end
     
 % Read subtomo

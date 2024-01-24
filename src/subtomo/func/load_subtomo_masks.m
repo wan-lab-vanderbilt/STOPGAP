@@ -46,7 +46,7 @@ for i = 1:o.n_classes
             
             % Check for local copy
             if o.copy_local
-                copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/',['mask_',num2str(i),'_copied'],s.wait_time,mask_name,false);
+                copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/',['mask_',num2str(i),'_copied'],s.wait_time,mask_name,false,s.copy_function);
             end
             
             % Load first mask
@@ -74,7 +74,7 @@ for i = 1:o.n_classes
                 
                 % Check for local copy
                 if o.copy_local
-                    copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/',['mask_',num2str(i),'_copied'],s.wait_time,mask_name,false);
+                    copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/',['mask_',num2str(i),'_copied'],s.wait_time,mask_name,false,s.copy_function);
                 end
                 
                 % Load next mask
@@ -103,7 +103,7 @@ if strcmp(mode{1},'avg') || p(idx).completed_ali
             
             % Check for local copy
             if o.copy_local
-                copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/',['specmask_copied'],s.wait_time,specmask_name,false);
+                copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/',['specmask_copied'],s.wait_time,specmask_name,false,s.copy_function);
             end
                 
             % Read mask

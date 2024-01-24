@@ -62,7 +62,7 @@ if refresh
      
     % Check for local copy
     if o.copy_local
-        copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/','motivelist_copied',s.wait_time,o.motl_name,false);
+        copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/','motivelist_copied',s.wait_time,o.motl_name,false,s.copy_function);
     end
     
     % Read motive list

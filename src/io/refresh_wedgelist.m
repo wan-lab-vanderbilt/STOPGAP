@@ -24,7 +24,7 @@ if refresh
     
     % Check for local copy
     if o.copy_local   
-        copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/','wedgelist_copied',s.wait_time,[o.listdir,p(idx).wedgelist_name],false);        
+        copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/','wedgelist_copied',s.wait_time,[o.listdir,p(idx).wedgelist_name],false,s.copy_function);        
     end
 
     

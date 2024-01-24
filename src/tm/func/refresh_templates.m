@@ -59,7 +59,7 @@ disp([s.cn,'Refreshing templates!!!']);
 
 % Check for local copy
 if o.copy_local   
-    copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/','tlist_copied',1,[o.listdir,p(idx).tlist_name],false);        
+    copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/','tlist_copied',1,[o.listdir,p(idx).tlist_name],false,s.copy_function);        
 end
 
 % Read template list

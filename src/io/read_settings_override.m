@@ -2,20 +2,32 @@ function overrides = read_settings_override(rootdir,filename)
 %% read_settings_override
 % Read settings override file and return as a struct array.
 %
-% WW 05-2018
+% WW 01-2023
 
-% Open .star file
-fid = fopen([rootdir,filename],'r');
-text = textscan(fid, '%s', 'Delimiter', '\n');
+%% Get global settings
 
-% Find non-empty indices
-idx = find(cellfun(@(x) ~isempty(x),text{1}));
-n_idx = numel(idx);
+% Get $STOPGAPHOME
+STOPGAPHOME = strtrim(get_environmental_variable('$STOPGAPHOME'));
 
-% Parse parameters
-overrides = cell(n_idx,2);
-for i = 1:n_idx
-    overrides(i,:) = strsplit(text{1}{idx(i)},'=');
+% Read global settings
+if exist([STOPGAPHOME,'lib/global_settings.txt'],'file')
+    global_settings = read_settings([STOPGAPHOME,'lib/global_settings.txt']);
+else
+    global_settings = [];
 end
 
+
+%% Get local settings
+
+% Read local settings
+if exist([rootdir,filename],'file')
+    local_settings = read_settings([rootdir,filename]);
+else
+    local_settings = [];
+end
+
+%% Return overrides
+
+% Concatenate
+overrides = cat(1,global_settings,local_settings);
 

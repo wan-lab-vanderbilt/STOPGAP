@@ -80,7 +80,7 @@ for h = 1:2
                                   
             % Check for local copy
             if o.copy_local
-                copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/',['ref_',char(64+h),'_copied'],s.wait_time,ref_name,false);
+                copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/',['ref_',char(64+h),'_copied'],s.wait_time,ref_name,false,s.copy_function);
             end
             
             % Read reference
@@ -116,7 +116,7 @@ for h = 1:2
                 
                 % Check for local copy
                 if o.copy_local
-                    copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/',['ref_',num2str(o.classes(i)),'_',char(64+h),'_copied'],s.wait_time,ref_name,false);
+                    copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/',['ref_',num2str(o.classes(i)),'_',char(64+h),'_copied'],s.wait_time,ref_name,false,s.copy_function);
                 end
                 
                 % Read reference

@@ -10,7 +10,7 @@ function o = check_copy_local(o,s)
 if sg_check_param(s,'copy_local')
     
     % Check if sufficent settings are given for local copying
-    if sg_check_param(s,'n_nodes') && sg_check_param(s,'user_id') && sg_check_param(s,'job_id')
+    if sg_check_param(s,'n_nodes') && sg_check_param(s,'user_id') %&& sg_check_param(s,'job_id')
         
         % Set local copying 
         o.copy_local = s.copy_local;    

@@ -43,7 +43,8 @@ end
 
 % Set local temporary root directory
 % o.rootdir = [s.localtempdir,'/stopgap_u',s.user_id,'_j',s.job_id,'/'];
-o.rootdir = [s.localtempdir,'/stopgap_u',s.user_id,'/'];
+% o.rootdir = [s.localtempdir,'/stopgap_u',s.user_id,'/'];
+o.rootdir = s.localtempdir;
 
 % Set first core in node as copy core
 if o.local_id == 1

@@ -32,7 +32,7 @@ end
 
 
 % Read in settings
-s = sg_get_subtomo_settings(s,p(idx).rootdir,'settings.txt');  % Get settings
+s = sg_get_subtomo_settings(s,p(idx).rootdir,'subtomo_settings.txt');  % Get settings
 
 % Initialize struct array to hold objects
 o = struct();

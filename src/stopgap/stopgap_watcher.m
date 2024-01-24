@@ -8,9 +8,14 @@ function stopgap_watcher(rootdir,paramfilename,n_cores, submit_cmd)
 % a submit_cmd, which then causes the watcher to watch an already running 
 % job. 
 %
-% WW 12-2023
+% WW 06-2019
 
 
+% % % % % % % % DEBUG
+% rootdir = '/dors/wan_lab/home/wanw/research/HIV_testset/subset_from_scratch/subtomo/bin8/init_ref/';
+% paramfilename = 'params/subtomo_param.star';
+% n_cores = 1;
+% submit_cmd = '';
 
 
 %% Check input

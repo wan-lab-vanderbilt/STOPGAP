@@ -14,7 +14,7 @@ o.mask_name = [o.maskdir,p(idx).mask_name];
 
 % Check for local copy
 if o.copy_local
-    copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/','mask_copied',s.wait_time,o.mask_name,false);
+    copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/','mask_copied',s.wait_time,o.mask_name,false,s.copy_function);
 end
 
 

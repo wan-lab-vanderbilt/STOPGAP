@@ -161,7 +161,7 @@ if o.copy_local
     end
     
     % Copy files
-    time = copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/','subtomos_copied',s.wait_time,subtomolist_name,true,'tar');
+    time = copy_file_to_local_temp(o.copy_core,p(idx).rootdir,o.rootdir,'copy_comm/','subtomos_copied',s.wait_time,subtomolist_name,true,s.copy_function);
     if o.copy_core
         disp([s.cn,'Subtomograms copied in: ',num2str(time),' seconds!!!']);
     end

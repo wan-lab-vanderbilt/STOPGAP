@@ -20,11 +20,11 @@ if o.copy_local
     % Copy tomogram    
     if o.copy_core
         disp([s.cn,'Copying tomogram ',o.tomo_name,' to local temporary directory...']);
-        time = copy_file_to_local_temp(o.copy_core,[path,'/'],o.rootdir,'copy_comm/',['tomo_',num2str(p(idx).tomo_num),'_copied'],s.wait_time,tomo_file_name,false);        
+        time = copy_file_to_local_temp(o.copy_core,[path,'/'],o.rootdir,'copy_comm/',['tomo_',num2str(p(idx).tomo_num),'_copied'],s.wait_time,tomo_file_name,false,s.copy_function);        
         disp([s.cn,'Tomogram copied in ',num2str(time),' seconds!!!']);
     else 
         disp([s.cn,'Waiting for tomogram ',o.tomo_name,' to be copied to local temporary directory...']);
-        copy_file_to_local_temp(o.copy_core,[path,'/'],o.rootdir,'copy_comm/',['tomo_',num2str(p(idx).tomo_num),'_copied'],s.wait_time,tomo_file_name,false);        
+        copy_file_to_local_temp(o.copy_core,[path,'/'],o.rootdir,'copy_comm/',['tomo_',num2str(p(idx).tomo_num),'_copied'],s.wait_time,tomo_file_name,false,s.copy_function);        
     end
     
     
@@ -39,11 +39,11 @@ if o.copy_local
         % Copy tomogram mask
         if o.copy_core
             disp([s.cn,'Copying tomogram ',o.tomo_mask_name,' to local temporary directory...']);
-            time = copy_file_to_local_temp(o.copy_core,[path,'/'],o.rootdir,'copy_comm/',['tomo_',num2str(p(idx).tomo_num),'mask_copied'],s.wait_time,tomo_mask_file_name,false);        
+            time = copy_file_to_local_temp(o.copy_core,[path,'/'],o.rootdir,'copy_comm/',['tomo_',num2str(p(idx).tomo_num),'mask_copied'],s.wait_time,tomo_mask_file_name,false,s.copy_function);        
             disp([s.cn,'Tomogram copied in ',num2str(time),' seconds!!!']);
         else 
             disp([s.cn,'Waiting for tomogram ',o.tomo_mask_name,' to be copied to local temporary directory...']);
-            copy_file_to_local_temp(o.copy_core,[path,'/'],o.rootdir,'copy_comm/',['tomo_',num2str(p(idx).tomo_num),'mask_copied'],s.wait_time,tomo_mask_file_name,false);        
+            copy_file_to_local_temp(o.copy_core,[path,'/'],o.rootdir,'copy_comm/',['tomo_',num2str(p(idx).tomo_num),'mask_copied'],s.wait_time,tomo_mask_file_name,false,s.copy_function);        
         end
     end
       

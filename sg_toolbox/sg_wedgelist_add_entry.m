@@ -5,7 +5,7 @@
 % Minimum parameters include tomogram number, pixelsize, tomogram size, and
 % tilt-scheme parameters.
 %
-% WW 06-2018
+% WW 01-2024
 
 %% Inputs
 
@@ -18,14 +18,15 @@ t.tomo_z       = 1188;   % Full tomogram Z-dimension
 t.z_shift      = 0;      % Z-shift during tomogram reconstruction
 
 % Tilt-series parameters
-min_tilt     = -70;         % Minimum tilt angle
-max_tilt     = 50;          % Maximum tilt angle
-tilt_step    = 2;           % Tilt step
+min_tilt     = -60;         % Minimum tilt angle
+max_tilt     = 60;          % Maximum tilt angle
+tilt_step    = 3;           % Tilt step
 tilt_scheme  = 'hagen';     % Supported are 'unidirectional', 'bidirectional', and 'hagen'.
-bi_start = 10;               % Starting tilt for bidirectional scheme. Ignore otherwise.
+tilt_start = 0;            % Starting tilt angle.
 tilt_direction = '+';       % Tilting direction from starting tilt.
 excluded_tilts = [];        % Excluded tilts from tilt-range. Leave empty '[]' for no removed tilts.
-dose = 0;                   % Dose per tilt in e/A^2.
+grouping = 3;               % For grouped Hagen scheme collection. Set to 1 for no grouping. 
+dose = 3;                   % Dose per tilt in e/A^2.
 
 % Defocus list (Text file containing defocii in sorted order)
 def_list_name = 'none';
@@ -37,7 +38,7 @@ m.cs = 2.7;                 % Spherical abberation (mm)
 
 
 % Output name
-wedgelistname = 'wedgelist_47.star';
+wedgelistname = 'wedgelist_test.star';
 
 
 %% Generate dose list
@@ -65,51 +66,133 @@ switch tilt_scheme
         
         % Calculate angle list
         if tilt_direction == '-'
-            a1 = bi_start:-tilt_step:min_tilt;
+            a1 = tilt_start:-tilt_step:min_tilt;
             dose_list(1:numel(a1),1) = a1;
             a2 = bistart+tilt_step:tilt_step:max_tilt;
             dose_list(numel(a1)+1:end,1) = a2;
         elseif tilt_direction == '+'
-            a1 = bi_start:tilt_step:max_tilt;
+            a1 = tilt_start:tilt_step:max_tilt;
             dose_list(1:numel(a1),1) = a1;
-            a2 = bi_start-tilt_step:-tilt_step:min_tilt;
+            a2 = tilt_start-tilt_step:-tilt_step:min_tilt;
             dose_list(numel(a1)+1:end,1) = a2;
         end
     
         
     case 'hagen'
-        if (abs(min_tilt) == abs(max_tilt)) % Hagen scheme
     
-            t_idx = 2; % Tilt index
-            m_idx = 1; % Multiple
+        % Initialize indices to track Hagen Scheme
+        pos_tilt = tilt_start;
+        neg_tilt = tilt_start;
+        tilt_idx = 1;
+        curr_tilt_direction = tilt_direction;
+        pos_done = false;
+        neg_done = false;
+        dose_list(1,1) = tilt_start;
+        
+        % Check direction
+        switch tilt_direction
+            case '+'
+                pos_count = 2;
+                neg_count = 1;
+            case '-'
+                pos_count = 1;
+                neg_count = 2;
 
-            % Fill tilt amplitudes
-            for i = 1:floor(n_tilts/2)
-                dose_list(t_idx:t_idx+1,1) = [m_idx;m_idx].*tilt_step;
-                t_idx = t_idx+2;
-                m_idx = m_idx+1;
-            end
+        end
 
+        % Fill Hagen Scheme angles
+        while (~pos_done || ~neg_done) && (tilt_idx < n_tilts)
+            switch curr_tilt_direction
+                case '+'
 
-            if tilt_direction == '-'
-                t_idx = 1;
-                steps = floor(n_tilts/2);
-            elseif tilt_direction == '+'
-                t_idx = 3;
-                steps = floor(n_tilts/2)-1;
-            end
-            n = -1;
+                    % Check if limit has been reached
+                    if (pos_tilt >= max_tilt) || pos_done
+                        % Swap direction
+                        curr_tilt_direction = '-';
+                        continue
+                    end
 
-            for i = 1:steps
-                dose_list(t_idx:t_idx+1,1) = dose_list(t_idx:t_idx+1,1).*n;
-                t_idx = t_idx+2;
-                n = n*-1;
-            end
+                    % Calculate tilt increments
+                    increments = pos_tilt + ((1:grouping)*tilt_step);
 
-            if tilt_direction == '-'
-                dose_list(end,1) = dose_list(end,1)*-1;
+                    % Check if increments goes beyond limit
+                    lim_idx = increments > max_tilt;
+                    if any(lim_idx)
+                        pos_done = true;
+                        increments = increments(~lim_idx);
+                        if isempty(increments)
+                            continue
+                        end
+                    end
+
+                    % Store angles
+                    dose_list(tilt_idx+1:tilt_idx+numel(increments),1) = increments;
+
+                    % Store last increment
+                    pos_tilt = increments(end);
+
+                    % Update tilt index
+                    tilt_idx = tilt_idx+numel(increments);
+
+                    % Check for swap
+                    if pos_count == 1
+                        pos_count = 2;
+                    else
+                        pos_count = 1;
+                        % Swap direction
+                        curr_tilt_direction = '-';
+                    end
+
+                case '-'
+
+                    % Check if limit has been reached
+                    if (neg_tilt <= min_tilt) || neg_done
+                        % Swap direction
+                        curr_tilt_direction = '+';
+                        continue
+                    end
+
+                    % Calculate tilt increments
+                    increments = neg_tilt + ((1:grouping)*-tilt_step);
+
+                    % Check if increments goes beyond limit
+                    lim_idx = increments < min_tilt;
+                    if any(lim_idx)
+                        neg_done = true;
+                        increments = increments(~lim_idx);
+                        if isempty(increments)
+                            continue
+                        end
+                    end
+
+                    % Store angles
+                    dose_list(tilt_idx+1:tilt_idx+numel(increments),1) = increments;
+
+                    % Store last increment
+                    neg_tilt = increments(end);
+
+                    % Update tilt index
+                    tilt_idx = tilt_idx+numel(increments);
+
+                    % Check for swap
+                    if neg_count == 1
+                        neg_count = 2;
+                    else
+                        neg_count = 1;
+                        % Swap direction
+                        curr_tilt_direction = '+';
+                    end
             end
         end
+
+        % Check for early termination
+        if tilt_idx < n_tilts
+            % Crop list
+            dose_list = dose_list(1:tilt_idx,:);
+        end
+            
+
+    
     
 end
 

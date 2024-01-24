@@ -2,11 +2,14 @@
 ## stopgap_watcher.sh
 # A wrapper script for running stopgap_watcher.
 #
-# WW 06-2019
-
+# WW 01-2024
 
 set -e              # Crash on error
 set -o nounset      # Crash on unset variables
+
+# Set root of local temporary folder
+LOCAL_TEMP_ROOT=/tmp/
+
 
 # Parse input arguments
 args=("$@")
@@ -19,9 +22,9 @@ submit_cmd=${args[4]}
 
 # Check for local
 if [ "${run_type}" = "local" ]; then
-    source $STOPGAPHOME/lib/stopgap_config_franklin.sh 
+    source $STOPGAPHOME/lib/stopgap_config_local.sh 
 elif [ "${run_type}" = "slurm" ]; then
-    source $STOPGAPHOME/lib/stopgap_config_accre2.sh 
+    source $STOPGAPHOME/lib/stopgap_config_slurm.sh 
 else
     echo 'ACHTUNG!!! Invalid run_type!!!'
     echo 'Only supported run_types are "local", and "slurm"!!!'
@@ -31,12 +34,11 @@ fi
 
 
 # Set MCR directory
-source $STOPGAPHOME/lib/stopgap_prepare_mcr.sh 
+source $STOPGAPHOME/lib/stopgap_prepare_mcr.sh ${LOCAL_TEMP_ROOT}
 
 # Run matlab script
 eval $STOPGAPHOME/lib/stopgap_watcher ${rootdir} ${paramfilename} ${n_cores} "'${submit_cmd}'"
-# echo ${rootdir} ${paramfilename} ${n_cores} "'${submit_cmd}'"
-# echo "$@"
+
 
 # Cleanup
 rm -rf /tmp/${USER}/mcr/stopgap_watcher

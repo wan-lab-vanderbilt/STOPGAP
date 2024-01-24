@@ -6,6 +6,16 @@ function stopgap(varargin)
 %
 % WW 03-2021
 
+% % % % DEBUG
+% SLURM DEBUG
+% varargin = {'rootdir', '/dors/wan_lab/home/wanw/research/HIV_testset/subset_from_scratch/subtomo/bin1/full/', 'paramfilename', 'params/subtomo_param.star', 'procnum', '1', 'n_cores', '512', 'user_id', '1234', 'job_id', '123123', 'node_name', 'cn100', 'node_id', '1', 'n_nodes', '4', 'cpus_on_node' '128' 'local_id', '1' 'copy_local' '0'};
+% MPI DEBUG
+% varargin = {'rootdir', '/dors/wan_lab/home/rothfusj/datasets/stopgapTutorial/HIV_practical/subtomo/init_ref/', 'paramfilename', 'params/subtomo_param.star', 'procnum', '2', 'n_cores', '10', 'user_id', '1234', 'node_name', 'cn100', 'n_nodes', '1', 'cpus_on_node' '10' 'local_id', '2' 'copy_local' '0'};
+
+% %% Evaluate numeric inputs
+% if (ischar(procnum)); procnum=eval(procnum); end
+% if (ischar(n_cores)); n_cores=eval(n_cores); end
+
 
 %% Parse inputs
 
