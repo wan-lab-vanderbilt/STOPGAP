@@ -1,13 +1,13 @@
 STOPGAP 0.7.3
 STOPGAP is a subtomogram averaging workflow written in MATLAB for
- performing a number of subtomogram averaging tasks including 
+performing a number of subtomogram averaging tasks including 
 template matching, high-resolution alignment and averaging, and 
 classification. 
 
 
 Supplied is the source code, a set of example bash scripts, and 
 instructions on how to compile and run STOPGAP. Pre-compiled 
-binaries are also supplied; these were compiled using MATLAB R2015b. 
+binaries are also supplied; these were compiled using MATLAB R2020b. 
 
 
 STOPGAP is free software: you can redistribute it and/or modify it 
