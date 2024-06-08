@@ -1,22 +1,23 @@
+function sg_neighbor_plot_local(motl_name,output_name,boxsize,scaling)
 %% sg_neighbor_plot_local
 % A function for reading in motivelist and generating a neighbor plot for
 % a motivelist. When calculating the neighbor plot, only inter-subunit
 % distances within each object is considered.
 %
-% WW 08-2018
+% WW 05-2024
 
-%% Inputs
-
-
-% Input motl
-motl_name = 'allmotl_9.star';
-
-% Output root name
-output_root = 'nplot_9.mrc';
-
-% Plot parameters
-boxsize = 256;
-scaling = 1;
+% %% Inputs
+% 
+% 
+% % Input motl
+% motl_name = 'allmotl_9.star';
+% 
+% % Output root name
+% output_name = 'nplot_9.mrc';
+% 
+% % Plot parameters
+% boxsize = 256;
+% scaling = 1;
 
 
 
@@ -93,7 +94,7 @@ nplot(cen,cen,cen) = 0;
 nplot(cen,cen,cen) = max(nplot(:));
 
 % Write output
-sg_volume_write(output_root,nplot);
+sg_volume_write(output_name,nplot);
         
         
     

@@ -25,10 +25,31 @@ for i = 1:n_fields
         switch field_types{idx,2}
 
             case 'num' 
-                numcell = cellfun(@(x) str2double(x), {s.(fields{i})},'UniformOutput', false);
+                
+                % Check if conversion is needed
+                if isnumeric(s(1).(fields{i}))
+                    continue
+                end
+                
+                % Check for comma for array input
+                comma_test = cellfun(@(x) strfind(x,','), {s.(fields{i})},'UniformOutput', false);
+                if ~isempty(comma_test)
+                    % Convert to numerical array
+                    numcell = cellfun(@(x) str2num(x), {s.(fields{i})},'UniformOutput', false); %#ok<ST2NM>
+                else
+                    % Convert to number
+                    numcell = cellfun(@(x) str2double(x), {s.(fields{i})},'UniformOutput', false);
+                end
+                % Store values
                 [s.(fields{i})] = numcell{:};
 
             case 'boo'
+                
+                % Check if conversion is needed
+                if islogical(s(1).(fields{i}))
+                    continue
+                end
+                
                 boocell = num2cell(cellfun(@(x) sg_eval_bool(x),{s.(fields{i})}));
                 [s.(fields{i})] = boocell{:};
         end

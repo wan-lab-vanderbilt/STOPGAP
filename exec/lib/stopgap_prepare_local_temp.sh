@@ -2,21 +2,21 @@
 # A script to setup a temporary local temporary directory 
 # for copying input data. 
 # 
-# WW 03-2021
+# WW 01-2024
 
+# Parse input arguments
+args=("$@")
+LOCAL_TEMP=${args[0]}
 
 cleanup_temp_dir()
 {
-  return_val=$?
-  if [[ $LOCAL_TEMP == /tmp/stopgap_u${UID}_j${SLURM_JOB_ID} ]]; then
+    return_val=$?
     rm -rf ${LOCAL_TEMP}
-  fi
-  exit ${return_val}
+    exit ${return_val}
 }
 
 
-# export LOCAL_TEMP="/tmp/stopgap_u${UID}_j${SLURM_JOB_ID}"
-export LOCAL_TEMP="/tmp/stopgap_u${UID}"
+#export LOCAL_TEMP="$LOCAL_TEMP_ROOT/stopgap_u${UID}"
 mkdir -p $LOCAL_TEMP/copy_comm/
 trap 'cleanup_temp_dir' EXIT
 

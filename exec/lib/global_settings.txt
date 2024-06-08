@@ -1,0 +1,4 @@
+## global_settings.txt
+# Settings defined here will be used whenever STOPGAP runs a task. 
+# Define settings as [setting_name]=[setting]
+

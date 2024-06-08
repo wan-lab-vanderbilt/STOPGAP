@@ -3,12 +3,9 @@
 #
 # WW 06-2019
 
-# Force shell
-# export MATLAB_SHELL="/bin/sh"
 
 # Source MCR
 matlabRoot="/accre/arch/easybuild/software/BinDist/MATLAB/2020b/"
-#matlabRoot="/wanw/MCR_R2020b/v99/"
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}":$matlabRoot/runtime/glnxa64/"
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}":$matlabRoot/bin/glnxa64/"
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}":$matlabRoot/sys/os/glnxa64/"

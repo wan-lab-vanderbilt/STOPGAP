@@ -1,3 +1,4 @@
+function sg_motl_shift_and_rotate(input_name,output_name,shifts,rotations)
 %% sg_motl_shift_and_rotate
 % A function for applying a shift and rotation to an entire motivelist. The
 % shifts and rotations are with respect to the refrence frame, and are
@@ -7,23 +8,26 @@
 % using sg_rotate_vol(sg_shift_vol(ref,[x_shift,y_shift,z_shift]),[phi,psi,the]).
 % These shifts and rotations are then the input for this script. 
 %
-% WW 08-2018
+% ww 05-2024: modified to make into a function.
+% Shifts are provided as [x,y,z] and rotations as [phi,psi,the];
+%
+% WW 05-2024
 
 %% Inputs
 
-% Motivelists
-input_name = 'combined.star';
-output_name = 'combined_shift.star';
+% % Motivelists
+% input_name = 'combined.star';
+% output_name = 'combined_shift.star';
 
 % Shifts
-x_shift = 0;
-y_shift = 0;
-z_shift = 1;
+x_shift = shifts(1);
+y_shift = shifts(2);
+z_shift = shifts(3);
 
 % Rotations
-phi = 0;
-psi = 0;
-the = 0;
+phi = rotations(1);
+psi = rotations(2);
+the = rotations(3);
 
 
 %% Initialize

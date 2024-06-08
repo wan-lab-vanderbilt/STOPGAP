@@ -3,8 +3,6 @@
 #
 # WW 06-2019
 
-# Force shell
-# export MATLAB_SHELL="/bin/sh"
 
 # Source MCR
 matlabRoot="/usr/local/MATLAB/R2020b"

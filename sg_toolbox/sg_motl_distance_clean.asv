@@ -8,15 +8,15 @@ function sg_motl_distance_clean(input_motl,output_motl,d_cut,s_cut)
 
 % %% Inputs
 % 
-% % % Motivelist names
-% input_motl = 'allmotl_tomo1_obj1_shift_7.star';
-% output_motl = 'allmotl_tomo1_obj1_shift_dclean_7.star';
-% 
-% % Distance cutoff (pixels)
-% d_cut = 48;
-% 
-% % Score cutoff
-% s_cut = 0;
+% % Motivelist names
+input_motl = '';
+output_motl = 'allmotl_tomo1_obj1_shift_7.star';
+
+% Distance cutoff (pixels)
+d_cut = 48;
+
+% Score cutoff
+s_cut = 0;
 
 
 %% Intialize

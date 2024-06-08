@@ -1,21 +1,22 @@
+function sg_motl_distance_clean_xyz(input_motl,output_motl,d_cut,s_cut)
 %% sg_motl_distance_clean_xyz
 % Remove overlapping points for each tomogram within a motivelist. Points
 % are cleaned using a given distance threshold; within the threshold, the
 % position with the highest score is kept. 
 %
-% WW 08-2018
+% WW 05-2024
 
-%% Inputs
-
-% Motivelist names
-input_motl = 'allmotl_2.star';
-output_motl = 'allmotl_dclean_2.star';
-
-% Distance cutoff (pixels)
-d_cut = [5,5,20];
-
-% Score cutoff
-s_cut = 0;
+% %% Inputs
+% 
+% % Motivelist names
+% input_motl = 'allmotl_2.star';
+% output_motl = 'allmotl_dclean_2.star';
+% 
+% % Distance cutoff (pixels)
+% d_cut = [5,5,20];
+% 
+% % Score cutoff
+% s_cut = 0;
 
 
 %% Intialize

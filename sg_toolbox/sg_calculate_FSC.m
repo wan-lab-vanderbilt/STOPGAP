@@ -1,4 +1,5 @@
-%% sg_calcualte_fsc
+function sg_calculate_FSC(varargin)
+%% sg_calculate_FSC
 % A function for calculating the FSC of two halfmaps using a
 % 'mask-corrected' phase-randomization approach (see: 
 % doi:10.1016/j.ultramic.2013.06.004). Phase-randomization can produce
@@ -8,68 +9,45 @@
 % The two halfmaps can then be averaged using figure-of-merit weighting and
 % b-factor sharpening (see: 10.1016/j.jmb.2003.07.013).
 %
-% WW 07-2018
+% WW 05-2024
 
 
 %% Inputs
 
+% Check for help
+if numel(varargin) == 1
+    if strcmpi(varargin,'help')
+        sg_calcualte_fsc_print_help();
+        return
+    else
+        error('ACHTUNG!!! Unexpected input. Run with "help" to get documentation...');
+    end
+end
 
-% References
-refA_name = 'ref_cc007_dclean48_A_9_crop.mrc';
-refB_name = 'ref_cc007_dclean48_B_9_crop.mrc';
-
-% FSC mask
-mask_name = 'cylinder.mrc';
-
-% Volume parameters
-symmetry = 'C6';      % Symmetry operator. 'C1' for no symmetry.
-pixelsize = 1.35;     % In Angstroms
-
-% Output name
-ref_avg_name = 'none';  % Name of output filtered reference. Set to 'none' for no averaging.
-flip_density = 1;
-
-% Figure-of-merit weighitng
-apply_fom = 1;     % (1 = on, 0 = off) Only disable if already applied.
-
-% B-factor sharpening
-bfactor = -80;     % Set to 0 for no sharpening.
-fsc_thresh = 0.143; % FSC-value for lowpass filter threshold  
-edge_smooth = 3; % Smooth box edge. 0 = off, otherwise odd number must be given.
-plot_filt = 0;  % Plot sharpening filter
-
-% Plotting parameters
-plot_diagnostic = 0;        % Plot diagnostic plots the uncorrected, corrected, and mask FSC curves. Disabling plots cumulative corrected curves, allowing for direct comparison of runs.
-resolution_label = 0;       % (1 = on, 0 = off)
-res_label = [32,16,8,6,4,2];    % X-axis label resolutions (in Angstroms). Labels beyond Nyquist are ignored.
-
-
-
-% FSC calculation options
-fourier_cutoff = 5; % Phase randomization cutoff resolution (in pixels). Pretty much a fudge factor. 5-15 seems reasonable... -WW
-n_repeats = 10;      % More repeats produces better estimate, but longer calculation time.
+% Parse parameters
+fsc_param = sg_calculate_fsc_parse_inputs(varargin);
 
 
 %% Initialize 
 % Read references
-refA = sg_volume_read(refA_name);
-refB = sg_volume_read(refB_name);
+refA = sg_volume_read(fsc_param.refA_name);
+refB = sg_volume_read(fsc_param.refB_name);
 
 % Size of edge of box
 boxsize = size(refA,1);
 
 % Read mask
-if ~strcmp(mask_name ,'none')
-    mask = sg_volume_read(mask_name);
+if ~strcmp(fsc_param.mask_name ,'none')
+    mask = sg_volume_read(fsc_param.mask_name);
 else
     mask = ones(size(refA));
 end
 
 % Apply symmetry
-if ~strcmp(symmetry,'C1')
+if ~strcmp(fsc_param.symmetry,'C1')
 %     mask = sg_symmetrize_volume(mask,symmetry);
-    refA = sg_symmetrize_volume(refA,symmetry);
-    refB = sg_symmetrize_volume(refB,symmetry);
+    refA = sg_symmetrize_volume(refA,fsc_param.symmetry);
+    refB = sg_symmetrize_volume(refB,fsc_param.symmetry);
 end
 
 % Apply masks
@@ -88,7 +66,7 @@ mftB = fftshift(fftn(mrefB));
 R = sg_distancearray(refA,1);
 
 % Determine for phase randomization
-pr_sub = (R > fourier_cutoff);
+pr_sub = (R > fsc_param.fourier_cutoff);
 pr_idx = find(pr_sub);
 n_pr = size(pr_idx,1);
 
@@ -153,7 +131,7 @@ fsc = real(AB_cc_array./sqrt(intA_array.*intB_array));
 %% Repeat phase-randomized FSC calculations
 
 % Intialize randomized FSC array
-rfsc = zeros(n_repeats,n_shells);
+rfsc = zeros(fsc_param.n_repeats,n_shells);
 
 % Random shell arrays
 rAB_cc_array = zeros(1,n_shells); % Complex conjugate of A and B
@@ -161,7 +139,7 @@ rintA_array = zeros(1,n_shells); % Intenisty of A
 rintB_array = zeros(1,n_shells); % Intenisty of B
 
 % Repeate randomization calculation
-for r = 1:n_repeats
+for r = 1:fsc_param.n_repeats
     
     % Randomize phases
     rphase_A = phase_A;
@@ -204,8 +182,8 @@ for r = 1:n_repeats
     
 end
 
-corr_fsc = mean((repmat(fsc,[n_repeats,1])-rfsc)./(1-rfsc),1);
-corr_fsc(1:fourier_cutoff-1) = fsc(1:fourier_cutoff-1);
+corr_fsc = mean((repmat(fsc,[fsc_param.n_repeats,1])-rfsc)./(1-rfsc),1);
+corr_fsc(1:fsc_param.fourier_cutoff-1) = fsc(1:fsc_param.fourier_cutoff-1);
 
 %% Plot
 
@@ -213,7 +191,7 @@ corr_fsc(1:fourier_cutoff-1) = fsc(1:fourier_cutoff-1);
 m_rfsc = mean(rfsc,1);
 
 % Plot corrected FSC
-if plot_diagnostic == 1
+if fsc_param.plot_diagnostic == 1
     figure
     hold on
     plot(1:n_shells,corr_fsc,'LineWidth',2,'Color','k')
@@ -235,22 +213,22 @@ ylabel('Fourier Shell Correlation','FontSize',14);
 
 
 % Label X-axis with resolution labels
-if resolution_label == 1
+if fsc_param.x_label == 1
     
     % Remove labels beyond nyquist
-    res_keep = res_label >= (pixelsize*2);
-    res_label = res_label(res_keep);
+    res_keep = fsc_param.res_label >= (fsc_param.pixelsize*2);
+    fsc_param.res_label = fsc_param.res_label(res_keep);
     
     % Number of labels
-    n_res = numel(res_label);
+    n_res = numel(fsc_param.res_label);
 
     % X-value for each label
     x_res = zeros(n_res,1);
     for i = 1:n_res
-        x_res(i) = (boxsize*pixelsize)/res_label(i);
+        x_res(i) = (boxsize*fsc_param.pixelsize)/fsc_param.res_label(i);
     end
 
-    set (gca, 'XTickLabel', res_label)
+    set (gca, 'XTickLabel', fsc_param.res_label)
     set (gca, 'XTick', x_res)
     xlabel('Resolution (Angstroms)','FontSize',14);
     
@@ -288,7 +266,7 @@ for i = 1:n_points
         x_val = ((fsc_points(i)-y1)/m)+x1;
 
         % Write out resolution
-        fsc_values(i) = (size(refA,1)*pixelsize)/x_val;
+        fsc_values(i) = (size(refA,1)*fsc_param.pixelsize)/x_val;
 
         % Display output
         disp(['FSC at ',num2str(fsc_points(i)),' = ',num2str(fsc_values(i),'%.1f'),' Angstroms.']);
@@ -300,29 +278,29 @@ end
 
 %% Filtering
 
-if ~isempty(ref_avg_name) && ~strcmp(ref_avg_name,'none')
+if ~isempty(fsc_param.ref_avg_name) && ~strcmp(fsc_param.ref_avg_name,'no_output_ref')
     
     % Initialize 1D filter
     filt_1d = ones(1,boxsize/2);
     
     % Calculate FOM
-    if apply_fom == 1
+    if fsc_param.apply_fom == 1
         Cref = real(sqrt((2.*abs(corr_fsc))./(1+abs(corr_fsc))));   % 1D filter
         filt_1d = filt_1d.*Cref;   % Calculate 3D filter
     end
 
     % Calcualte sharpening filter
-    if bfactor ~= 0
+    if fsc_param.bfactor ~= 0
         % Calculate 1D frequency array
         freq_1d = 1:boxsize/2;
-        freq_1d = (boxsize*pixelsize)./freq_1d;
+        freq_1d = (boxsize*fsc_param.pixelsize)./freq_1d;
         % Calculate sharpening filter
-        exp_filt = exp(-(bfactor./(4.*(freq_1d.^2))));
+        exp_filt = exp(-(fsc_param.bfactor./(4.*(freq_1d.^2))));
         filt_1d = filt_1d.*exp_filt;
     end
     
     % Determine threhold in Fourier pixels
-    cut_idx = find(corr_fsc(2:end)<=fsc_thresh,1)+1;
+    cut_idx = find(corr_fsc(2:end)<=fsc_param.fsc_thresh,1)+1;
     % Set lowpass
     filt_1d(cut_idx:end) = 0;
     
@@ -333,12 +311,12 @@ if ~isempty(ref_avg_name) && ~strcmp(ref_avg_name,'none')
     ref_avg = (refA+refB)./2;
     
     % Box edge mask
-    if edge_smooth > 0
+    if fsc_param.edge_smooth > 0
         box_mask = zeros(boxsize,boxsize,boxsize);
-        b1 = (2*edge_smooth)+1;
-        b2 = boxsize - (2*edge_smooth);
+        b1 = (2*fsc_param.edge_smooth)+1;
+        b2 = boxsize - (2*fsc_param.edge_smooth);
         box_mask(b1:b2,b1:b2,b1:b2) = 1;
-        box_mask = smooth3(box_mask,'gaussian',edge_smooth, edge_smooth);
+        box_mask = smooth3(box_mask,'gaussian',fsc_param.edge_smooth, fsc_param.edge_smooth);
         ref_avg = ref_avg.*box_mask;
     end
 
@@ -349,14 +327,14 @@ if ~isempty(ref_avg_name) && ~strcmp(ref_avg_name,'none')
     filt_ref = real(ifftn(ft_avg.*ifftshift(filter)));
     
     % Flip density
-    if flip_density == 1
+    if fsc_param.flip_density == 1
         filt_ref = filt_ref.*-1;
     end
 
     % Write output
-    sg_mrcwrite(ref_avg_name,filt_ref,[],'pixelsize',pixelsize);
+    sg_mrcwrite(fsc_param.ref_avg_name,filt_ref,[],'pixelsize',fsc_param.pixelsize);
     
-    if plot_filt == 1
+    if fsc_param.plot_sharp == 1
         figure
         plot(filt_1d);
     end
