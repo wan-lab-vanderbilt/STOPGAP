@@ -1,4 +1,4 @@
-STOPGAP 0.7.3
+STOPGAP 0.7.4
 STOPGAP is a subtomogram averaging workflow written in MATLAB for
 performing a number of subtomogram averaging tasks including 
 template matching, high-resolution alignment and averaging, and 
