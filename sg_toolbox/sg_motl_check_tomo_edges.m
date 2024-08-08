@@ -33,7 +33,7 @@ z1 = 1 + padding(3);
 if ischar(tomo_info)
     
     % Get tomogram header
-    header = sg_read_mrc_header(tomo_name);
+    header = sg_read_mrc_header(tomo_info);
 
     % Calculate boundaries
     x2 = header.nx - padding(1) - 1;
