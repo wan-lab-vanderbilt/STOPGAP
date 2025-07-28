@@ -36,12 +36,9 @@ param.filter = {'calc_exp', 'calc_ctf';
                 'nrq',      'nrq'};
 
 % Other parameters              
-% param.other = {'binning', 'apply_laplacian', 'scoring_fcn', 'noise_corr';
-%                'num',     'boo',             'str',         'num';
-%                'req',     'nrq',             'nrq',         'nrq'};
-param.other = {'binning', 'apply_laplacian', 'noise_corr';
-               'num',     'boo',             'num';
-               'req',     'nrq',             'nrq'};
+param.other = {'binning', 'tilesize', 'apply_laplacian', 'noise_corr';
+               'num',     'num',      'boo',             'num';
+               'req',     'req',      'nrq',             'nrq'};
 
            
 % Tomo parameters

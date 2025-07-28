@@ -23,16 +23,16 @@ function sg_motl_batch_filament(tomolist_name,motl_name,radlist_name,metadata_ty
 % WW 08-2022
 
 
-%%%%% DEBUG
-tomolist_name = 'tomolist.mat';
-motl_name = 'pos28_motl_1.star';
-radlist_name = 'pos28_motl_1_rad.txt';
-metadata_type = 'tube';
-binning = 8;
-l_dist = 4;
-phi_angle = 'random';
-padding = 32;
-subset_list = [];
+% %%%%% DEBUG
+% tomolist_name = 'tomolist.mat';
+% motl_name = 'pos28_motl_1.star';
+% radlist_name = 'pos28_motl_1_rad.txt';
+% metadata_type = 'tube';
+% binning = 8;
+% l_dist = 4;
+% phi_angle = 'random';
+% padding = 32;
+% subset_list = [];
 
 %% Check check
 

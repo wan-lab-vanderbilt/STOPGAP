@@ -72,7 +72,10 @@ elseif isfield(o,'bounds')
     o = rmfield(o,'bounds');
 end
 
+% Parse tomogram number
+o.tomo_num = num2str(p(idx).tomo_num);
 
+    
 %% Generate job parameters
 
 % % Check scoring function
@@ -87,6 +90,9 @@ o = determine_tile_size(p,o,s,idx);
 
 % Get tile coordinates
 o = get_tm_coords(p,o,idx);
+
+% Prepare matchlist
+o = prepare_matchlist(p,o,s,idx);
 
 
 

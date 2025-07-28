@@ -17,7 +17,7 @@ tlist_name = 'tlist_20deg.star';
 
 % Parameters
 tmpl_name = 'tmpl.mrc';
-mask_name = 'cyl_mask2.mrc';
+mask_name = 'cyl_mask.mrc';
 symmetry = 'c6';
 anglist_name = 'anglist_20deg_c1.csv';
 

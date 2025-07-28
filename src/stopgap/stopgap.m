@@ -8,9 +8,9 @@ function stopgap(varargin)
 
 % % % % DEBUG
 % SLURM DEBUG
-% varargin = {'rootdir', '/dors/wan_lab/home/wanw/research/HIV_testset/subset_from_scratch/subtomo/bin1/full/', 'paramfilename', 'params/subtomo_param.star', 'procnum', '1', 'n_cores', '512', 'user_id', '1234', 'job_id', '123123', 'node_name', 'cn100', 'node_id', '1', 'n_nodes', '4', 'cpus_on_node' '128' 'local_id', '1' 'copy_local' '0'};
+% varargin = {'rootdir', '/dors/wan_lab/home/wanw/research/HIV_testset/subset_from_scratch/shc_speed_test/crop_shc/bin2/', 'paramfilename', 'params/subtomo_param.star', 'procnum', '1', 'n_cores', '100', 'user_id', '1234', 'job_id', '123123', 'node_name', 'cn100', 'node_id', '1', 'n_nodes', '1', 'cpus_on_node' '8' 'local_id', '1' 'copy_local' '1'};
 % MPI DEBUG
-% varargin = {'rootdir', '/hd1/wwan/practicals/2024_umich/aws_copy/init_ref/', 'paramfilename', 'params/subtomo_param.star', 'procnum', '1', 'n_cores', '1', 'user_id', '1234', 'node_name', 'cn100', 'n_nodes', '1', 'cpus_on_node' '1' 'local_id', '1' 'copy_local' '0'};
+% varargin = {'rootdir', '/dors/wan_lab/home/wanw/research/HIV_testset/subset_from_scratch/subtomo/bin8_tm_tilesize_test/', 'paramfilename', 'params/tm_param.star', 'procnum', '1', 'n_cores', '20', 'user_id', '1234', 'node_name', 'cn100', 'n_nodes', '1', 'cpus_on_node' '20' 'local_id', '1' 'copy_local' '0'};
 
 % %% Evaluate numeric inputs
 % if (ischar(procnum)); procnum=eval(procnum); end

@@ -24,6 +24,7 @@ ordered_fields = {'completed_p_tm', 'boo';
                   'hp_rad', 'num';
                   'hp_sigma', 'num';
                   'binning', 'num';
+                  'tilesize', 'num';
                   'calc_exp', 'boo';
                   'calc_ctf', 'boo';
                   'apply_laplacian','boo';

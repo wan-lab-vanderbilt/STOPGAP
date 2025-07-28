@@ -1,4 +1,19 @@
 function o = sg_ali_cone_angles(o,angincr,angiter,phi_angincr,phi_angiter)
+%% sg_ali_cone_angles
+% A function to compose search angles. This requires an input object array
+% "o", which is returned with the search angles. 
+%
+% Inputs:
+% o = object array
+% angincr = cone angle increment
+% angiter = cone angle iteration
+% phi_angincr = phi angular increment
+% phi_angiter = phi angular iterations
+%
+%%%%%
+% WW 06-2020
+
+%% Calculate angles
 
 
 % Calculate cone angles

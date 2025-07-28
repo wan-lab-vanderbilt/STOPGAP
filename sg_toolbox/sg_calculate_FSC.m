@@ -1,14 +1,15 @@
 function sg_calculate_FSC(varargin)
 %% sg_calculate_FSC
 % A function for calculating the FSC of two halfmaps using a
-% 'mask-corrected' phase-randomization approach (see: 
-% doi:10.1016/j.ultramic.2013.06.004). Phase-randomization can produce
-% random artifacts in the FSC plot; averaging repeated randomizations can
-% produce a better estimate of the true mask-corrected FSC. 
+% 'mask-corrected' phase-randomization approach. Phase-randomization can 
+% produce random artifacts in the FSC plot; averaging repeated 
+% randomizations can produce a better estimate of the true mask-corrected 
+% FSC. (see: doi:10.1016/j.ultramic.2013.06.004).
 %
 % The two halfmaps can then be averaged using figure-of-merit weighting and
 % b-factor sharpening (see: 10.1016/j.jmb.2003.07.013).
 %
+%%%%%
 % WW 05-2024
 
 
@@ -17,7 +18,7 @@ function sg_calculate_FSC(varargin)
 % Check for help
 if numel(varargin) == 1
     if strcmpi(varargin,'help')
-        sg_calcualte_fsc_print_help();
+        help_sg_calculate_FSC();
         return
     else
         error('ACHTUNG!!! Unexpected input. Run with "help" to get documentation...');

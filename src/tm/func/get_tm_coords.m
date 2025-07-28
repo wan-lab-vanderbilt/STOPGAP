@@ -60,14 +60,14 @@ for i = 1:3
     be(temp_idx,i) = tomo_size(i);
 end
 
-% Size of tiles
+% Size of final tiles
 t_size = be - bs + 1;
 
 
 %% Calculate extraction positions
 
 % Extraction start
-es = bs - repmat(floor(o.padsize/2),[n_tiles,3]);
+es = bs - floor((repmat(tilesize,n_tiles,1) -(be-bs+1))./2);    % Calculate padsize from tilesize, in case of bounds at the tilesize
 ee = es + repmat(tilesize-1,[n_tiles,1]);
 
 
@@ -93,8 +93,8 @@ te(d_end_idx) = te(d_end_idx) + double(d_end(d_end_idx));
 
 %% Calculate tiles from CC map
 
-cs = repmat(floor(o.padsize/2)+1,[n_tiles,3]);    % Crop start
-ce = cs + t_size - 1;                           % Crop end
+cs = floor((repmat(tilesize,n_tiles,1) -(be-bs+1))./2) + 1;    % Crop start
+ce = cs + t_size - 1;                                      % Crop end
 
 %% Store arrays
 

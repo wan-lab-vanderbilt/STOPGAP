@@ -3,6 +3,10 @@ function [data,header] = sg_mrcread(mrc_name)
 % A function to read a .mrc file accoding to the IMOD formatting
 % definitions. Extended headers are ignored.
 %
+% Inputs:
+% mrc_name = name of input .mrc file (str)
+%
+%%%%%
 % WW 06-2018
 
 %% Initialize

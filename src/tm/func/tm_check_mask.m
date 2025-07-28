@@ -19,6 +19,7 @@ if o.procnum == 1
     
     % Read mask
     mask = sg_mrcread(o.tomo_mask_name);
+    dims = size(mask);
         
     % Get projections    
     proj = cell(3,1);
@@ -33,6 +34,24 @@ if o.procnum == 1
         o.bounds(1,i) = find(proj{i} > 0,1,'first');      % Start
         o.bounds(2,i) = find(proj{i} > 0,1,'last');       % End
         o.bounds(3,i) = o.bounds(2,i) - o.bounds(1,i) + 1;    % Width
+        
+        % Ensure even widths
+        round_bound = round_to_even(o.bounds(3,i));
+        if o.bounds(3,i) ~= round_bound
+            
+            % Check against tomo dims
+            if round_bound > dims(i)
+                continue
+            end
+            
+            % Round up to nearest even integer
+            o.bounds(3,i) = round_bound;
+            
+            % Add extra to end
+            o.bounds(2,i) = o.bounds(2,i) + 1;
+            
+        end
+        
     end
     
     

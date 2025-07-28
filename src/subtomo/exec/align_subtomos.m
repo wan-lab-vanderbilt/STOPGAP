@@ -81,6 +81,11 @@ while p_idx <= numel(packet_idx)
     else
         start_name = [p(idx).rootdir,o.commdir,'alipacket_',num2str(packet)];
     end
+    if ~exist(start_name,'dir')
+        pause(s.wait_time*rand);    % Guard against overrun...
+    else
+        continue
+    end
     [packet_check,~] = system(['mkdir ',start_name]);
     if packet_check ~= 0
         p_idx = p_idx + 1;
@@ -185,7 +190,8 @@ while p_idx <= numel(packet_idx)
         
         % Generate new packet index
         packet_idx = setdiff(1:o.total_packets,comp_packet);
-        packet_idx = packet_idx(randperm(numel(packet_idx)));   % Randomize order of packets
+%         packet_idx = packet_idx(randperm(numel(packet_idx)));   % Randomize order of packets
+        packet_idx = flip(packet_idx); % Start with the latest packets
         
         % Reset packet counter
         p_idx = 1;

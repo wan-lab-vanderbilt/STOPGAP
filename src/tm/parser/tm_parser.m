@@ -5,7 +5,7 @@ function tm_parser(varargin)
 % WW 01-2019
 
 %%%% DEBUG
-% varargin = {'param_name', 'tm_param.star', 'rootdir', '/fs/pool/pool-plitzko/will_wan/jonathan/sg_tm_0.3/', 'tempdir', 'none', 'commdir', 'none', 'tmpldir', 'none', 'maskdir', 'none', 'mapdir', 'none', 'listdir', 'none', 'wedgelist_name', 'wedgelist.star', 'tomolist_name', 'tomolist2.txt', 'tlist_name', 'tlist_groel.star', 'smap_name', 'smap_flcf_groel_6deg_40A_c7', 'omap_name', 'omap_flcf_groel_6deg_40A_c7', 'tmap_name', 'tmap_flcf_groel_6deg_40A_c7', 'lp_rad', '11', 'lp_sigma', '3', 'hp_rad', '1', 'hp_sigma', '2', 'binning', '4', 'noise_corr', '1'};
+varargin = {'param_name', 'tm_param.star', 'rootdir', '/hd1/wwan/riboprot/130k_singleshot/subtomo/bin8_prot_laptest/', 'tempdir', 'none', 'commdir', 'none', 'tmpldir', 'none', 'maskdir', 'none', 'mapdir', 'none', 'listdir', 'none', 'wedgelist_name', 'wedgelist.star', 'tomolist_name', 'tomolist2.txt', 'tlist_name', 'tlist_20deg.star', 'smap_name', 'smap_flcf_noise1_randphi', 'omap_name', 'omap_flcf_noise1_randphi', 'tmap_name', 'tmap_flcf_noise1_randphi', 'lp_rad', '18', 'lp_sigma', '3', 'hp_rad', '1', 'hp_sigma', '2', 'binning', '8', 'tilesize', '128', 'noise_corr', '1'};
 
 %% Generate input parser
 % Initialize parser
@@ -70,17 +70,29 @@ else
     listdir = 'lists/';
 end
 
-% Read tomolist
+% Open tomolist
 fid = fopen([p.rootdir,listdir,p.tomolist_name],'r');
-tomolist = textscan(fid,'%s %s');
+
+% Check number of columns
+line = strtrim(fgets(fid));
+n_col = numel(strfind(line,' ')) + 1;
+
+% Go back to start and parse blocks
+fseek(fid,0,'bof');
+tomolist = textscan(fid,'%s');
+
+% Close file
 fclose(fid);
-n_tomos = size(tomolist{1},1);
+
+% Reshape tomolist
+tomolist = reshape(tomolist{1},n_col,[])';
+n_tomos = size(tomolist,1);
 tomo_num = num2cell(zeros(n_tomos,1));
 
 % Check for numeric filename
 for i = 1:n_tomos
     % Parse name
-    [~, name, ~] = fileparts(tomolist{1}{i});
+    [~, name, ~] = fileparts(tomolist{i});
     % Check for integer
     if all(ismember(name,'0123456789'))
         tomo_num{i} = str2double(name);
@@ -125,10 +137,10 @@ end
 
 % Generate entry for each tomogram
 new_param = repmat(new_param,[n_tomos,1]);
-[new_param.tomo_name] = tomolist{1}{:};
+[new_param.tomo_name] = tomolist{:,2};
 [new_param.tomo_num] = tomo_num{:};
-if ~isempty([tomolist{2}{:}])
-    [new_param.tomo_mask_name] = tomolist{2}{:};
+if n_col == 3
+    [new_param.tomo_mask_name] = tomolist{:,3};
 end
 
 

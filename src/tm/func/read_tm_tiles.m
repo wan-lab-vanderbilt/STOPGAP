@@ -1,9 +1,11 @@
-function tile = read_tm_tiles(p,o,idx,file)
+function tile = read_tm_tiles(p,o,idx,file,tile_idx)
 %% read_tm_tiles
 % Read in the tiles for parallel template matching. To minimize I/O, tiles
 % are read as subvolumes rather than reading the entire tomogram.
 %
-% WW 01-2019
+% WW: Modified in 07-2024 for parallelization over matchlist.
+%
+% WW 07-2024
 
 %% Initialize
 
@@ -56,12 +58,9 @@ end
 data_start = ftell(fid);        % Start of .mrc data
 
 
-% Parse tile index
-t = o.procnum;
-
 % Parse extraction corners
-start_coord = o.c.es(t,:);
-end_coord = o.c.ee(t,:);
+start_coord = o.c.es(tile_idx,:);
+end_coord = o.c.ee(tile_idx,:);
 
 % Volume size
 v_size = end_coord-start_coord+1;
@@ -113,7 +112,7 @@ tile = tile.*header.amean;
 
 
 % Paste extracted volume
-tile(o.c.ts(t,1):o.c.te(t,1),o.c.ts(t,2):o.c.te(t,2),o.c.ts(t,3):o.c.te(t,3)) = reshape(vol,v_size);
+tile(o.c.ts(tile_idx,1):o.c.te(tile_idx,1),o.c.ts(tile_idx,2):o.c.te(tile_idx,2),o.c.ts(tile_idx,3):o.c.te(tile_idx,3)) = reshape(vol,v_size);
 
     
 % Close file

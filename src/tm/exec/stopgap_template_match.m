@@ -25,16 +25,7 @@ s = sg_get_tm_settings(s,p(idx).rootdir,'tm_settings.txt');
 
 % Initialize struct array to hold objects
 o = initialize_o_struct(p,s,idx,'tm');
-% o = initialize_o_struct(s);
-% 
-% % Parse directories
-% o = sg_parse_tm_directories(p,o,s,idx);
-% 
-% 
-% % Cleanup comm folder
-% if o.procnum == 1
-%     system(['rm -f ',p(end).rootdir,'/',o.commdir,'/*']);
-% end
+
 
 
     
@@ -48,10 +39,7 @@ while run
     o = tm_check_copy_local(p,o,s,idx);         % Check for local copying
     o = refresh_wedgelist(p,o,s,idx);        % Read wedgelist
     o = refresh_templates(p,o,s,idx);        % Read template and mask
-    o = prepare_parallel_tm(p,o,s,idx);      % Calcalate coordinates of tiles
-    
-    % Parse tomogram number
-    o.tomo_num = num2str(p(idx).tomo_num);
+    o = prepare_parallel_tm(p,o,s,idx);      % Calcalate coordinates of tiles   
     
     
     %%%%% Prepare for parallel template matching %%%%%    
@@ -62,8 +50,8 @@ while run
         o = generate_tm_bpf(p,o,s,idx);             % Generate bandpass filter             
         o = initialize_fourier_crop_tm(o,s);        % Iniitalize Fourier cropping
         o = initialize_phase_randomization(p,o,s,idx);  % Generate noise maps
-%         disp([s.cn,'Optimizing FFT wisdom...']);
-%         optimize_fft_wisdom(o.tilesize,'single');    % Optimize fft
+        disp([s.cn,'Optimizing FFT wisdom...']);
+        optimize_fft_wisdom(o.tilesize,'single');    % Optimize fft
 
 
 
@@ -128,7 +116,7 @@ while run
         
         % Remove temporary files
         system(['rm -f ',o.tempdir,'/*']);
-        system(['rm -f ',o.commdir,'/*']);
+        system(['rm -rf ',o.commdir,'/*']);
 
         % Write checkjob
         system(['touch ',p(old_idx).rootdir,'/',o.commdir,'complete_final_tm_',o.tomo_num]);

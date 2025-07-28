@@ -1,0 +1,16 @@
+Changes in 0.7.5
+
+In addition to varous bug fixes, the main difference between 0.7.4 and 0.7.5 is
+an update to how template matching is parallelized. Rather than splitting the 
+input tomogram by the number of cores, an input tilesize is given. The tilesize
+is essentially target size of the tile to be spliced back into the output maps.
+The actual extraction size is tilesize + template size, rounded down to 
+generate equally sized tiles. Parallelization is then between tiles and angles.
+
+This has several practical effects. The main one is that computation time and
+number of cores scales nearly linearly. The second is that you can tune the 
+tilesize to fit the memory on your system; assume ~5x the tilesize. While 
+larger tilesizes have fewer computations due to a smaller percentage of 
+calculations going towards the overlap regions, large tiles may be more costly
+to compute with; you may wish to tune this for balance but 192 can be a good
+starting point. 

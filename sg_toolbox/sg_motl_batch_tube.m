@@ -30,13 +30,13 @@ function sg_motl_batch_tube(tomolist_name,motl_name,radlist_name,metadata_type,b
 
 % % % %%%% DEBUG
 % tomolist_name = 'tomolist.mat';
-% motl_name = 'motl/tomo2_init_tube_2.star';
-% radlist_name = 'motl/tomo2_init_radlist_2.txt';
-% metadata_type = 'init_tube_2';
-% binning = 4;
-% l_dist = 4;
+% motl_name = 'init/init_pick_1.star';
+% radlist_name = 'init/init_radlist_2.txt';
+% metadata_type = 'init_pick';
+% binning = 8;
+% l_dist = 5;
 % c_dist = 3;
-% padding = 32;
+% padding = 40;
 % subset_list = [];
 
 %% Check check
@@ -86,6 +86,12 @@ for i = 1:n_tomos
             process = false;
         end
     end
+    
+    % Check if aligned
+    if ~tm_check_if_aligned(tomolist(i))
+        process = false;
+    end
+    
     if ~process        
         continue
     end

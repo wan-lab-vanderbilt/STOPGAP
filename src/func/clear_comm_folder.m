@@ -10,7 +10,7 @@ function clear_comm_folder(p,o,s,idx)
 if o.procnum == 1
     
     % Clear comm folder
-    system(['rm -f ',p(idx).rootdir,'/',o.commdir,'/*']);
+    system(['rm -rf ',p(idx).rootdir,'/',o.commdir,'/*']);
     
     % Write clear file
     system(['touch ',p(idx).rootdir,'/',o.commdir,'/comm_cleared_',num2str(idx)]);

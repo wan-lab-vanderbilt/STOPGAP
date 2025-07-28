@@ -41,6 +41,12 @@ for i = 1:n_tomos
         continue
     end
     
+    % Check if aligned
+    if ~tm_check_if_aligned(tomolist(i))
+        continue
+    end
+    
+    
     % Initialize temporary wedgelist
     wedgelist_temp = struct();
     

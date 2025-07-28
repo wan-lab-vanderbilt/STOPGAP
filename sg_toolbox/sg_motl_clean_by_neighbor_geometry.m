@@ -1,4 +1,5 @@
-%% sg_motl_clean_by_neigbor_geometry
+% function sg_motl_clean_by_neighbor_geometry(input_motl, output_motl, cmm_name, cmm_cen, cmm_scale)
+%% sg_motl_clean_by_neighbor_geometry
 % Clean a motivelist by local neighbor geometry. 
 %
 % The neighbor geometries are defined in a chimera .cmm file; it's best to
@@ -11,18 +12,30 @@
 %
 % WW 08-2018
 
-%% Inputs
+% %% Inputs
+% 
+% % % Motivelist names
+% input_motl = 'allmotl_tomo1_obj1_shift_7.star';
+% output_motl = 'allmotl_tomo1_obj1_shift_dclean_7.star';
+% 
+% % Distance cutoff (pixels)
+% d_cut = 48;
+% 
+% % Score cutoff
+% s_cut = 0;
 
-% File parameters
-input_motl = 'allmotl_B_dclean2_4.star';            % Input motl name
-output_motl = 'allmotl_B_dclean2_gclean_4.star';    % Output motl name
-cmm_name = 'geometry_2points.cmm';                          % Geometry file
-cmm_cen = 129;                                       % Center of geometry file
-cmm_scale = 4;
-
-% Cleaning parameters
-dist_cut = 1;      % Distance tolerance for neighbor search
-tolerance = 0;     % Number of missing neighbors that can be tolerated.
+% %% Inputs
+% 
+% % File parameters
+% input_motl = 'allmotl_B_dclean2_4.star';            % Input motl name
+% output_motl = 'allmotl_B_dclean2_gclean_4.star';    % Output motl name
+% cmm_name = 'geometry_2points.cmm';                          % Geometry file
+% cmm_cen = 129;                                       % Center of geometry file
+% cmm_scale = 4;
+% 
+% % Cleaning parameters
+% dist_cut = 1;      % Distance tolerance for neighbor search
+% tolerance = 0;     % Number of missing neighbors that can be tolerated.
 
 
 %% Initialize

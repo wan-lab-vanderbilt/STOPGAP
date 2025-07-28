@@ -34,7 +34,10 @@ omap_name='omap_name'                           # Root name of orientation map. 
 tmap_name='tmap_name'                           # Root name of template map. Final name is [tmap_name]_[tomo_num].[vol_ext]. This is only written when more than one template used.
 
 # Binning
-binning=4
+binning=4                                       # Binning of tomograms and template
+
+# Tile Size
+tilesize=192                                    # Target size of tomogram tiles for template matching. This is an upper limit as tiling depends on tomogram dimensions. 
 
 # Bandpass filter parameters
 lp_rad=11                                       # Low-pass filter radius in Fourier pixels or approximate real space resolution. To calculate resolution: (pixelsize*boxsize)/pixels.
@@ -63,6 +66,6 @@ parser="${STOPGAPHOME}/bin/stopgap_parser.sh"
 
 
 # Run parser
-eval "${parser} temp_match param_name ${param_name} rootdir ${rootdir} tempdir ${tempdir} commdir ${commdir} listdir ${listdir} tmpldir ${tmpldir} maskdir ${maskdir} mapdir ${mapdir} metadir ${metadir} tomolist_name ${tomolist_name} wedgelist_name ${wedgelist_name} tlist_name ${tlist_name} smap_name ${smap_name} omap_name ${omap_name} tmap_name ${tmap_name} binning ${binning} lp_rad ${lp_rad} lp_sigma ${lp_sigma} hp_rad ${hp_rad} hp_sigma ${hp_sigma} calc_exp ${calc_exp} calc_ctf ${calc_ctf} apply_laplacian ${apply_laplacian} noise_corr ${noise_corr}"
+eval "${parser} temp_match param_name ${param_name} rootdir ${rootdir} tempdir ${tempdir} commdir ${commdir} listdir ${listdir} tmpldir ${tmpldir} maskdir ${maskdir} mapdir ${mapdir} metadir ${metadir} tomolist_name ${tomolist_name} wedgelist_name ${wedgelist_name} tlist_name ${tlist_name} smap_name ${smap_name} omap_name ${omap_name} tmap_name ${tmap_name} binning ${binning} tilesize ${tilesize} lp_rad ${lp_rad} lp_sigma ${lp_sigma} hp_rad ${hp_rad} hp_sigma ${hp_sigma} calc_exp ${calc_exp} calc_ctf ${calc_ctf} apply_laplacian ${apply_laplacian} noise_corr ${noise_corr}"
 
 exit

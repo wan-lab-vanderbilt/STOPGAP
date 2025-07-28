@@ -22,15 +22,15 @@ function sg_motl_batch_sphere(tomolist_name,output_name,metadata_type,binning,p_
 %
 % WW 08-2022
 
-% % % % % DEBUG
-% tomolist_name = '/hd1/wwan/2022_embo-course/hiv_subset/tomo/tomolist.mat';
-% output_name = 'allmotl_1.star';
+% % % % % % DEBUG
+% tomolist_name = 'tomolist.mat';
+% output_name = 'init_ref/init_ref_1.star';
 % metadata_type = 'sphere';
 % binning = 8;
-% p_dist = 3.5;
+% p_dist = 6;
 % rand_phi = true;
 % padding = 16;
-% subset_list = 'subset_list.txt';
+% subset_list = '';
 
 %% Check check
 

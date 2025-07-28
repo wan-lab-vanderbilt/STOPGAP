@@ -15,4 +15,4 @@ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}":$matlabRoot/sys/opengl/lib/glnxa64/"
 # Required for MCR 2020b
 test -e /usr/bin/ldd &&  ldd --version |  grep -q "(GNU libc) 2\.17"  \
     && export LD_PRELOAD="${matlabRoot}/bin/glnxa64/glibc-2.17_shim.so"
-
+echo "MATLAB libraries sourced..."

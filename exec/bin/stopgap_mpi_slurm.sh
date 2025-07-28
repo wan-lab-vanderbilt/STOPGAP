@@ -10,9 +10,6 @@
 # Bash parameters
 set -o nounset      # Crash on unset variables
 
-# Load MATLAB module
-module load MATLAB/2020b    # Remove or update as necessary
-
 # Set root of local temporary folder
 LOCAL_TEMP_ROOT=/tmp/
 

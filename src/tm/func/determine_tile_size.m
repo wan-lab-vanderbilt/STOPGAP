@@ -19,43 +19,15 @@ end
 
 %% Determine tile size
 
-% Factorialize number of cores
-f = factor(o.n_cores);
-n_f = numel(f);
+% Calculate non-overlapping tilesize
+no_tilesize = p(idx).tilesize - o.tmpl_size;
 
-% Make sure number of factors is divisible by 3
-if mod(n_f,3)
-    f = cat(2,f,ones(1,(ceil(n_f/3)*3)-n_f));
-end
+% Calculate tile grid
+o.grid = ceil(tomo_size./no_tilesize);
 
-% Generate smallest box counts
-grid = prod(reshape(f,3,[]),2);
+% Calculate patch size
+o.patchsize = round_to_even(tomo_size./o.grid);
 
-% % Generate average box dimensions
-% [sort_tomo_size,sort_idx] = sortrows(cat(1,1:3,tomo_size)',2);
-% sort_patchsize = ceil(sort_tomo_size(:,2)./sort(grid));
-% patchsize = sort_patchsize(sort_tomo_size(sort_idx,1))';
-
-% % Generate average box dimensions
-% sort_grid = sort(grid);
-% [sort_tomo_size,sort_idx] = sortrows(cat(1,1:3,tomo_size)',2);
-% sort_patchsize = ceil(sort_tomo_size(:,2)./sort_grid-1);
-% patchsize = sort_patchsize(sort_tomo_size(sort_idx,1))';
-
-% Generate average box dimensions % M Obr edit
-sort_grid = sort(grid);
-sort_tomo_size = sortrows(cat(1,1:3,tomo_size)',2);
-[~,sort_idx]=sort(sort_tomo_size(:,1));
-sort_patchsize = ceil(sort_tomo_size(:,2)./sort_grid-1);
-patchsize = sort_patchsize(sort_idx)';
-
-% Store grid parameters
-% o.grid = sort_grid(sort_tomo_size(sort_idx,1));
-o.grid = sort_grid(sort_idx);
-
-
-% Round down patchsize to even
-o.patchsize = round_to_even(patchsize);
 
 % Decide padding size on scoring algorithm
 switch s.scoring_fcn
@@ -70,5 +42,10 @@ end
 % Set tilesize
 o.tilesize = o.patchsize + o.tmpl_size;
 
+% Check tilesize against bounded tomogram
+tile_bounds_idx = o.tilesize > tomo_size;
+if any(tile_bounds_idx)
+    o.tilesize(tile_bounds_idx) = tomo_size(tile_bounds_idx);
+end
 
 

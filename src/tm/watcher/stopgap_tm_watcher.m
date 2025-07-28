@@ -6,9 +6,9 @@ function stopgap_tm_watcher(rootdir,param_name,n_cores, submit_cmd)
 % WW 01-2019
 
 % % % % % % % DEBUG
-% rootdir = '/dors/wan_lab/home/wanw/research/empiar_10064/tm/vandy_sg_0.7.2/';
-% param_name = 'params/tm_param.star';
-% n_cores = 512;
+rootdir = '/dors/wan_lab/home/wanw/research/2024/20241206_wanw_hardenn_sCANC_TOMO/subtomo/bin8/tm/';
+param_name = 'params/tm_param.star';
+n_cores = 200;
 
 
 %% Check check
@@ -74,7 +74,7 @@ system(['mkdir ',p(idx).rootdir,'/blank/']);
 if ~isempty(submit_cmd)
     
     % Clear folders
-    system(['rm -f ',p(idx).rootdir,'/',o.commdir,'/*']);
+    system(['rm -rf ',p(idx).rootdir,'/',o.commdir,'/*']);
     
     % Submit job
     disp([s.cn,'Submitting job...']);
@@ -100,7 +100,7 @@ while run
     o = sg_parse_tm_directories(p,o,s,idx);     % Parse iteration directories into the o struct
     check_directories(p,o,idx);
 %     o = refresh_wedgelist(p,o,s,idx);        % Initialize wedgelist     
-    o = tm_get_total_angles(p,o,s,idx);   % Get number of angles to be matched
+%     o = tm_get_total_angles(p,o,s,idx);   % Get number of angles to be matched        
     
     
     % Parse tomogram number
@@ -123,14 +123,22 @@ while run
             disp([s.cn,'Masked regions determined...'])
         end
 
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        % Read number of matches
+        matchlist_name = ['tm_matchlist_',num2str(p(idx).tomo_num),'.csv'];
+        wait_for_it([p(idx).rootdir,'/',o.commdir],matchlist_name,s.wait_time);        
+        n_matches = dlmread([p(idx).rootdir,o.commdir,matchlist_name]);
 
+        
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         % Parallel template matching
         disp([s.cn,'Performing parallel template matching...']);
 
-        % Wait for all subtomograms
-        watch_progress(p,o,s,idx,'ptmprog',o.tot_ang,true,'angles matched...',50);
+        % Wait for all matches
+        watch_progress(p,o,s,idx,'ptmprog',n_matches,false,'orientations matched...',20);
     
     end
 
@@ -138,7 +146,7 @@ while run
     
     % Wait for step to complete
     wait_for_them([p(idx).rootdir,o.commdir],['sg_ptm_',o.tomo_num],o.n_cores,s.wait_time);
-    fprintf('\n%s\n',[s.cn,'All angles matched!!! Waiting for completed maps...']);
+    fprintf('\n%s\n',[s.cn,'All orientations matched!!! Waiting for completed maps...']);
     wait_for_it([p(idx).rootdir,'/',o.commdir,'/'],['complete_final_tm_',o.tomo_num],s.wait_time);
     fprintf('%s\n\n',[s.cn,'Template matching on tomogram ',num2str(p(idx).tomo_num),' complete!!!']);   
     
