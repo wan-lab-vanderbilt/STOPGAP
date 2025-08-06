@@ -5,7 +5,7 @@ function tm_parser(varargin)
 % WW 01-2019
 
 %%%% DEBUG
-varargin = {'param_name', 'tm_param.star', 'rootdir', '/hd1/wwan/riboprot/130k_singleshot/subtomo/bin8_prot_laptest/', 'tempdir', 'none', 'commdir', 'none', 'tmpldir', 'none', 'maskdir', 'none', 'mapdir', 'none', 'listdir', 'none', 'wedgelist_name', 'wedgelist.star', 'tomolist_name', 'tomolist2.txt', 'tlist_name', 'tlist_20deg.star', 'smap_name', 'smap_flcf_noise1_randphi', 'omap_name', 'omap_flcf_noise1_randphi', 'tmap_name', 'tmap_flcf_noise1_randphi', 'lp_rad', '18', 'lp_sigma', '3', 'hp_rad', '1', 'hp_sigma', '2', 'binning', '8', 'tilesize', '128', 'noise_corr', '1'};
+% varargin = {'param_name', 'tm_param.star', 'rootdir', '/hd1/wwan/riboprot/130k_singleshot/subtomo/bin8_prot_laptest/', 'tempdir', 'none', 'commdir', 'none', 'tmpldir', 'none', 'maskdir', 'none', 'mapdir', 'none', 'listdir', 'none', 'wedgelist_name', 'wedgelist.star', 'tomolist_name', 'tomolist2.txt', 'tlist_name', 'tlist_20deg.star', 'smap_name', 'smap_flcf_noise1_randphi', 'omap_name', 'omap_flcf_noise1_randphi', 'tmap_name', 'tmap_flcf_noise1_randphi', 'lp_rad', '18', 'lp_sigma', '3', 'hp_rad', '1', 'hp_sigma', '2', 'binning', '8', 'tilesize', '128', 'noise_corr', '1'};
 
 %% Generate input parser
 % Initialize parser
