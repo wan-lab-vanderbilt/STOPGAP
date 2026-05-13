@@ -1,4 +1,4 @@
-function sm = write_splitmotl(p,o,idx,sm,task,motl,ali)
+function sm = write_splitmotl(p,o,s,idx,sm,task,motl,ali)
 %% write_splitmotl
 % A function for initializing and writing of split motivelist during
 % parallel subtomogram alignment.
@@ -55,6 +55,7 @@ switch task
         % Open file
         sm_name = [o.tempdir,'/splitmotl_',num2str(o.procnum),'.temp'];
         sm.fid = fopen([p(idx).rootdir,'/',sm_name],'w');
+        disp([s.cn,'Opening new split motive list for outputs: ',sm_name]);
         
         
         
@@ -122,11 +123,17 @@ switch task
         
         % Finished writing
         fclose(sm.fid);
+        disp([s.cn,'Finished with subtomogram alignment and closing split motivelist...']);
         
         % Rename file
         sm_name1 = [o.tempdir,'/splitmotl_',num2str(o.procnum),'.temp'];
         sm_name2 = [o.tempdir,'/splitmotl_',num2str(o.procnum),'.star'];
-        system(['mv ',p(idx).rootdir,'/',sm_name1,' ',p(idx).rootdir,'/',sm_name2]);
+        try
+%             system(['mv ',p(idx).rootdir,'/',sm_name1,' ',p(idx).rootdir,'/',sm_name2]);
+            system(['cp ',p(idx).rootdir,'/',sm_name1,' ',p(idx).rootdir,'/',sm_name2]);
+        catch
+            error([s.cn,' could not move splitmotl!']);
+        end        
         
 end
 

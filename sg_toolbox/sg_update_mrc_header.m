@@ -7,7 +7,7 @@ function header = sg_update_mrc_header(data,header,varargin)
 %
 % Input can be given as name-value pairs.
 %
-% WW 06-2018
+% WW 06-2025
 
 %% Parse name value pairs
 
@@ -117,9 +117,9 @@ header.ylen = y*pixelsize(2);
 header.zlen = z*pixelsize(3);
                  
 % Statistics
-header.amin = min(data(:));
-header.amax = max(data(:));
-header.amean = mean(data(:));
+header.amin = single(min(data(:)));
+header.amax = single(max(data(:)));
+header.amean = single(mean(data(:)));
 
 % Mode
 switch class(data)
@@ -129,8 +129,12 @@ switch class(data)
         header.mode = 1;
     case {'single','double'}
         header.mode = 2;
+    case 'uint16'
+        header.mode = 6;
+    case 'half'
+        header.mode = 12;
     otherwise
-        error('ACHTUNG!!! Input data has unsupported data type!!! Only "int8", "int16", and "float" suppported!!!');        
+        error('ACHTUNG!!! Input data has unsupported data type!!! Only "int8", "int16", "float", "uint16", and "half" suppported!!!');        
 end
 
 

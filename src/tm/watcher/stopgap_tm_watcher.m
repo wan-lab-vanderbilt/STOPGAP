@@ -6,9 +6,9 @@ function stopgap_tm_watcher(rootdir,param_name,n_cores, submit_cmd)
 % WW 01-2019
 
 % % % % % % % DEBUG
-rootdir = '/dors/wan_lab/home/wanw/research/2024/20241206_wanw_hardenn_sCANC_TOMO/subtomo/bin8/tm/';
-param_name = 'params/tm_param.star';
-n_cores = 200;
+% rootdir = '/dors/wan_lab/home/wanw/research/2024/20241206_wanw_hardenn_sCANC_TOMO/subtomo/bin8/tm/';
+% param_name = 'params/tm_param.star';
+% n_cores = 200;
 
 
 %% Check check

@@ -21,5 +21,3 @@ q = sg_quaternion_normalize(q);
 
 % Reconvert
 [na1,na3,na2] = sg_quaternion2euler(q);
-
-

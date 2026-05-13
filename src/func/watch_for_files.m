@@ -1,4 +1,4 @@
-function watch_for_files(p,o,s,idx,filename,n_files,msg)
+function watch_for_files(p,o,s,idx,filename,n_files,msg,wait_time)
 %% watch_for_files
 % Watch for a number of files to be written. 
 %
@@ -6,6 +6,15 @@ function watch_for_files(p,o,s,idx,filename,n_files,msg)
 % lines indicates the progress of the job.
 %
 % WW 06-2019
+
+
+%% Check check
+if nargin == 7
+    wait_time = [];
+end
+if isempty(wait_time)
+    wait_time = s.wait_time;
+end
 
 %% Wait!!!
 
@@ -18,7 +27,7 @@ crash_log = false(o.n_cores,1);
 
 % Wait for files
 while n_complete < n_files
-    pause(s.wait_time);
+    pause(wait_time);
     
     % Count files
     n_complete = numel(dir([p(idx).rootdir,'/',o.commdir,'/',filename,'_*']));

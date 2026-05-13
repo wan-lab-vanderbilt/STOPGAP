@@ -138,11 +138,11 @@ while run
 %         n_cores_p_avg = csvread([p(idx).rootdir,o.commdir,'n_p_avg_',num2str(p(idx).iteration)]);
         
         % Wait until parallel averaging completion
-        watch_for_files(p,o,s,idx,'sg_p_avg',n_cores_p_avg,' parallel averages completed...');
+        watch_for_files(p,o,s,idx,'sg_p_avg',n_cores_p_avg,' parallel averages completed...',0.5);
         fprintf('\n%s\n',[s.cn,'Parallel averages written!!! Waiting for completion of parallel averaging step...']);
         
         % Wait for it
-        wait_for_it([p(idx).rootdir,'/',o.commdir],'complete_stopgap_p_avg',s.wait_time);
+        wait_for_it([p(idx).rootdir,'/',o.commdir],'complete_stopgap_p_avg',0.5);
         fprintf('%s\n\n',[s.cn,'Parallel averaging complete!!!']);
         
         % Refresh param file

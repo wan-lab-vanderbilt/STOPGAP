@@ -16,8 +16,11 @@ function [struct_array,data_block] = stopgap_star_read(star_name, parsenum, fiel
 % v3: WW 04-2018: Updated to take in field types
 % v4: WW 04-2018: Partial rewrite to check for specific .star formatting
 % and to parse specific data blocks
+% v5: WW 08-2025: fixed bugs to parse specific data blocks. Simplified some
+% aspects fo the code. 
 %
-% WW 04-2018
+% WW 08-2025
+
 
 %% Check check!!!
 if nargin < 3
@@ -39,24 +42,27 @@ end
 
 %% Read format information
 
-% Open .star file
+% Read .star file
 fid = fopen(star_name,'r');
-star = textscan(fid, '%s', 'Delimiter', '\n');
+star = textscan(fid, '%s', 'Delimiter', '\n', 'CommentStyle','#');
+star = star{1};
+fclose(fid);
+n_lines = size(star,1);
 
 % Find target data block
-data_idx = find(strncmp(star{1},'data_',5));
+data_idx = find(strncmp(star,'data_',5));
 n_data = numel(data_idx);
 if isempty(data_block) 
     if (n_data > 1)    
         error('ACHTUNG!!! Multiple data blocks detecked!!! Tell me what you want!!!');
     else
         % Parse data name
-        data_block = get_uncommented_string(star{1}{data_idx(1)},'#','data_');
+        data_block = get_uncommented_string(star{data_idx(1)},'#','data_');
     end
 else
     % Find target data block
     block_str = ['data_',data_block];
-    block_idx = find(strncmp(star{1},block_str,numel(block_str)));
+    block_idx = find(strncmp(star,block_str,numel(block_str)));
     n_blocks = numel(block_idx);
     if n_blocks > 1
         block_test = false(n_blocks,1);
@@ -67,20 +73,24 @@ else
             error(['ACHTUNG!!! More than one data block named ',data_block,'!!!']);
         else
             block_idx = block_idx(block_test);
-        end
-        
-        % Isolate data block
-        data_idx_idx = find(data_idx == block_idx);
-        star{1} = star{1}(data_idx(data_idx_idx):data_idx(data_idx_idx+1)-1);
+        end       
         
     elseif n_blocks == 0
         error('ACHTUNG!!! Data block not found!!!');
-    end                
+    end    
+    
+    % Isolate data block
+    data_idx_idx = find(data_idx == block_idx);
+    if data_idx_idx >= n_data
+        star = star(data_idx(data_idx_idx):n_lines);
+    else
+        star = star(data_idx(data_idx_idx):data_idx(data_idx_idx+1)-1);
+    end
     
 end
 
 % Find loop indices
-loop_idx = find(strncmp(star{1},'loop_',5));
+loop_idx = find(strncmp(star,'loop_',5));
 if isempty(loop_idx)
     error('ACHTUNG!!! Only loop-type .star files are supported!!!');
 elseif numel(loop_idx) > 1
@@ -88,7 +98,7 @@ elseif numel(loop_idx) > 1
 end
 
 % Find data names
-data_name_idx = find(strncmp(star{1},'_',1));
+data_name_idx = find(strncmp(star,'_',1));
 n_fields = numel(data_name_idx);
 if any(loop_idx > data_name_idx)
     error('ACHTUNG!!! This function does not support mixed loop and non-loop items!!!');
@@ -100,11 +110,11 @@ if ~isempty(fieldtypes)
 end
 fields = cell(n_fields,1);
 for i = 1:n_fields
-    fields{i} = get_uncommented_string(star{1}{data_name_idx(i)},'#','_');
+    fields{i} = get_uncommented_string(star{data_name_idx(i)},'#','_');
 end
 
 % Find empty lines
-empty_lines = cellfun('isempty',star{1});
+empty_lines = cellfun('isempty',star);
 
 
 %% Read data and convert to struct array
@@ -119,7 +129,7 @@ n_data = numel(data_idx); % Subtract fields, "loop_" and "data_"
 % Parse data
 data_cell = cell(n_fields,n_data);
 for i = 1:n_data
-    temp_string = get_uncommented_string(star{1}{data_idx(i)},'#');
+    temp_string = get_uncommented_string(star{data_idx(i)},'#');
     if ~isempty(temp_string)
         data_cell(:,i) = strsplit(temp_string);
     end

@@ -2,7 +2,7 @@ function compile_toolbox(target_dir)
 
 % Add sg_toolbox
 sg_toolbox_dir = '/dors/wan_lab/home/wanw/research/software/stopgap/0.7.5/sg_toolbox/';
-matlab_root = '/usr/local/MATLAB/R2020b/';
+matlab_root = '/perutz/os/modules/software/MATLAB/2020b/';
 
 % Compile
 target_dir = sg_check_dir_slash(target_dir);

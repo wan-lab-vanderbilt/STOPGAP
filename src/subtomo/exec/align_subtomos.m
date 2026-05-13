@@ -31,7 +31,7 @@ status = fopen([p(idx).rootdir,o.commdir,'aliprog_',num2str(o.procnum)],'w');
 
 % Initialize partial motl
 sm = struct();
-sm = write_splitmotl(p,o,idx,sm,'init',[],[]);
+sm = write_splitmotl(p,o,s,idx,sm,'init',[],[]);
 
 
 %% Perform angular search
@@ -76,6 +76,7 @@ while p_idx <= numel(packet_idx)
     packet_timer = tic;
     
     % Check if packet has been started
+    disp([s.cn,'Checking packet ',num2str(packet),' for completion...']);
     if o.copy_local == 1
         start_name = [o.rootdir,o.commdir,'alipacket_',num2str(packet)];
     else
@@ -84,11 +85,14 @@ while p_idx <= numel(packet_idx)
     if ~exist(start_name,'dir')
         pause(s.wait_time*rand);    % Guard against overrun...
     else
+        disp([s.cn,'Packet ',num2str(packet),' is already being computed... Moving on to next packet.']);
+        p_idx = p_idx + 1;
         continue
     end
     [packet_check,~] = system(['mkdir ',start_name]);
     if packet_check ~= 0
         p_idx = p_idx + 1;
+        disp([s.cn,'Packet ',num2str(packet),' is already being computed... Moving on to next packet.']);
         continue
     end  
     disp([s.cn,'Aligning packet ',num2str(packet),' out of ',num2str(o.total_packets),'!!!']); 
@@ -135,7 +139,7 @@ while p_idx <= numel(packet_idx)
     %     splitmotl = fill_splitmotl(splitmotl,ali,m);
     %     m = m+1;    % Split motl index
         tic;
-        sm = write_splitmotl(p,o,idx,sm,'write',motl,ali);
+        sm = write_splitmotl(p,o,s,idx,sm,'write',motl,ali);
         motl_write_time = toc;
 
         % Write progress
@@ -198,10 +202,16 @@ while p_idx <= numel(packet_idx)
     end
 end     % End packet loop
 
+if o.copy_local == 1
+    disp([s.cn,'No remaining packets to align on node ',num2str(o.node_id)]);
+else
+    disp([s.cn,'No remaining packets to align...']);
+end
+
 %% Write outputs
 
 % Close status writer
-sm = write_splitmotl(p,o,idx,sm,'close',[]);
+sm = write_splitmotl(p,o,s,idx,sm,'close',[]);
 fclose(status);
 
 % Write timings

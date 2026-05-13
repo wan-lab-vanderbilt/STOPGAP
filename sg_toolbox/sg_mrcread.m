@@ -7,7 +7,7 @@ function [data,header] = sg_mrcread(mrc_name)
 % mrc_name = name of input .mrc file (str)
 %
 %%%%%
-% WW 06-2018
+% WW 06-2025
 
 %% Initialize
 
@@ -48,24 +48,14 @@ switch header.mode
         data = fread(fid,n_pixels,'int16=>int16');
     case 2
         data = fread(fid,n_pixels,'single=>single');
+    case 6
+        data = fread(fid,n_pixels,'uint16=>uint16');
+    case 12
+        data = fread(fid,n_pixels,'uint16=>uint16');
+        data = half.typecast(data);
+        
 end
 data = reshape(data,[nx,ny,nz]);
 
 fclose(fid);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -6,7 +6,7 @@ function sg_mrcwrite(mrc_name,data,header,varargin)
 %
 % Extended headers are not supported and will be removed.
 %
-% WW 06-2018
+% WW 06-2025
 
 %% Check check
 
@@ -44,6 +44,10 @@ switch header.mode
         fwrite(fid,data,'int16');
     case 2
         fwrite(fid,data,'single');
+    case 6
+        fwrite(fid,data,'uint16');
+    case 12
+        fwrite(fid,data.storedInteger,'uint16');
 end
 
 
