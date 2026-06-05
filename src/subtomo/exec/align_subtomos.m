@@ -224,7 +224,7 @@ csvwrite([p(idx).rootdir,o.tempdir,'ali_timings_',num2str(p(idx).iteration+1),'_
 % sg_motl_write2(splitmotl_name,splitmotl,true);
 
 % Write completion file
-system(['touch ',p(idx).rootdir,'/',o.commdir,'/sg_ali_',num2str(o.procnum)]);
+system(['touch ',p(idx).rootdir,'/',o.commdir,'/sg_ali_',num2str(idx),'_',num2str(o.procnum)]);
 
 
 disp([s.cn,'Subtomogram alignment in iteration ',num2str(p(idx).iteration),' completed!!!1!one!']);

@@ -186,7 +186,7 @@ end
 
 
 % Write completion
-system(['touch ',p(idx).rootdir,'/',o.commdir,'/sg_p_avg_',num2str(o.procnum)]);
+system(['touch ',p(idx).rootdir,'/',o.commdir,'/sg_p_avg_',num2str(idx),'_',num2str(o.procnum)]);
 disp([s.cn,'Parallel averaging completed!!!1!']);
 
 

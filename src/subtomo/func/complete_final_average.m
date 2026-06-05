@@ -9,7 +9,7 @@ function complete_final_average(p,idx,o,s)
 
 % Wait until final averaging completion
 disp([s.cn,'Waiting for all final averages...']);
-wait_for_them([p(idx).rootdir,'/',o.commdir],'sg_f_avg',o.n_classes,s.wait_time);
+wait_for_them([p(idx).rootdir,'/',o.commdir],['sg_f_avg_',num2str(idx)],o.n_classes,s.wait_time);
 
 % Check for empty classes
 check_empty_classes(p,o,s,idx);
@@ -37,6 +37,6 @@ if o.copy_local
 end
 
 % Write completion files
-system(['touch ',p(old_idx).rootdir,'/',o.commdir,'/complete_stopgap_f_avg']);
+system(['touch ',p(old_idx).rootdir,'/',o.commdir,'/complete_stopgap_f_avg_',num2str(old_idx)]);
 disp([s.cn,'Final averaging complete!']);
 

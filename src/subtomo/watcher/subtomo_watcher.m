@@ -109,7 +109,7 @@ while run
         
         % Wait for step to complete
         fprintf('\n%s\n',[s.cn,'All subtomograms aligned!!! Waiting for completion of alignment step...']);
-        wait_for_it([p(idx).rootdir,'/',o.commdir,'/'],'complete_stopgap_ali',s.wait_time);
+        wait_for_it([p(idx).rootdir,'/',o.commdir,'/'],['complete_stopgap_ali_',num2str(idx)],s.wait_time);
         
         % Refresh param file
         [p, idx] = update_subtomo_param(s,rootdir,paramfilename);
@@ -138,11 +138,11 @@ while run
 %         n_cores_p_avg = csvread([p(idx).rootdir,o.commdir,'n_p_avg_',num2str(p(idx).iteration)]);
         
         % Wait until parallel averaging completion
-        watch_for_files(p,o,s,idx,'sg_p_avg',n_cores_p_avg,' parallel averages completed...',0.5);
+        watch_for_files(p,o,s,idx,['sg_p_avg_',num2str(idx)],n_cores_p_avg,' parallel averages completed...',0.5);
         fprintf('\n%s\n',[s.cn,'Parallel averages written!!! Waiting for completion of parallel averaging step...']);
         
         % Wait for it
-        wait_for_it([p(idx).rootdir,'/',o.commdir],'complete_stopgap_p_avg',0.5);
+        wait_for_it([p(idx).rootdir,'/',o.commdir],['complete_stopgap_p_avg_',num2str(idx)],0.5);
         fprintf('%s\n\n',[s.cn,'Parallel averaging complete!!!']);
         
         % Refresh param file
@@ -161,7 +161,7 @@ while run
         fprintf('\n%s\n',[s.cn,'All final averages written!!! Cleaning up iteration...']);
         
         % Wait for it
-        wait_for_it([p(idx).rootdir,'/',o.commdir],'complete_stopgap_f_avg',s.wait_time);
+        wait_for_it([p(idx).rootdir,'/',o.commdir],['complete_stopgap_f_avg_',num2str(idx)],s.wait_time);
         fprintf('%s\n\n',['Subtomogram averaging in iteration ',num2str(p(idx).iteration),' complete!!!']);
         
         % Refresh param file

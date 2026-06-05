@@ -98,7 +98,7 @@ while run
                 if o.procnum == 1
                     complete_subtomo_align(p(idx).rootdir,s.paramfilename,p,o,s,idx);
                 else
-                    wait_for_it([p(idx).rootdir,'/',o.commdir],'complete_stopgap_ali',s.wait_time);
+                    wait_for_it([p(idx).rootdir,'/',o.commdir],['complete_stopgap_ali_',num2str(idx)],s.wait_time);
                 end
                 clear_local_comm_dir(o,s);	% Clear local comm directory
                 
@@ -202,7 +202,7 @@ if ~p(idx).completed_p_avg
     if o.procnum == 1
         complete_parallel_average(p,o,s,idx)
     else
-        wait_for_it([p(idx).rootdir,'/',o.commdir],'complete_stopgap_p_avg',s.wait_time);
+        wait_for_it([p(idx).rootdir,'/',o.commdir],['complete_stopgap_p_avg_',num2str(idx)],s.wait_time);
     end
 end
 
@@ -230,7 +230,7 @@ if ~p(idx).completed_f_avg
     if o.procnum == 1
         complete_final_average(p,idx,o,s);
     else
-        wait_for_it([p(idx).rootdir,'/',o.commdir],'complete_stopgap_f_avg',s.wait_time);
+        wait_for_it([p(idx).rootdir,'/',o.commdir],['complete_stopgap_f_avg_',num2str(idx)],s.wait_time);
     end
 end
 

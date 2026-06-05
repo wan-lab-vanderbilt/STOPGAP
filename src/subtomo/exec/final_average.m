@@ -213,7 +213,7 @@ for i = 1:o.n_f_avg_class
     end
     
     % Write checkjob
-    system(['touch ',p(idx).rootdir,'/',o.commdir,'/sg_f_avg_',num2str(o.f_avg_class(i))]);
+    system(['touch ',p(idx).rootdir,'/',o.commdir,'/sg_f_avg_',num2str(idx),'_',num2str(o.f_avg_class(i))]);
     
     
     disp([s.cn,'Final averaging for class ',num2str(o.f_avg_class(i)),'complete!!!']);

@@ -9,7 +9,7 @@ function complete_parallel_average(p,o,s,idx)
 %% Wait for alignment to finish
     
 % Wait until align completion
-wait_for_them([p(idx).rootdir,'/',o.commdir],'sg_p_avg',o.n_cores_p_avg,s.wait_time);
+wait_for_them([p(idx).rootdir,'/',o.commdir],['sg_p_avg_',num2str(idx)],o.n_cores_p_avg,s.wait_time);
 
 
 %% Complete parallel averaging
@@ -24,9 +24,9 @@ disp([s.cn,' Parallel averaging complete! Updataing parameter file...']);
 
 
 % Write completion file
-system(['rm -f ',p(idx).rootdir,'/',o.commdir,'/sg_p_avg*']);    % Prevents overrun at next iteration...
-system(['rm -f ',p(idx).rootdir,'/',o.commdir,'/sg_f_avg*']);    % Prevents overrun at next step...
-system(['rm -f ',p(idx).rootdir,'/',o.commdir,'/complete_stopgap_f_avg']);    % Prevents overrun at next step...
-system(['touch ',p(idx).rootdir,'/',o.commdir,'/complete_stopgap_p_avg']);
+% system(['rm -f ',p(idx).rootdir,'/',o.commdir,'/sg_p_avg*']);    % Prevents overrun at next iteration...
+% system(['rm -f ',p(idx).rootdir,'/',o.commdir,'/sg_f_avg*']);    % Prevents overrun at next step...
+% system(['rm -f ',p(idx).rootdir,'/',o.commdir,'/complete_stopgap_f_avg']);    % Prevents overrun at next step...
+system(['touch ',p(idx).rootdir,'/',o.commdir,'/complete_stopgap_p_avg_',num2str(idx)]);
 disp([s.cn,'Parallel averaging complete!!!']);
                         
